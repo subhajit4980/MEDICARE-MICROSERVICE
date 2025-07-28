@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: API-GATEWAY
+  cloud:
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+      routes:
+        - id: AUTH-SERVICE
+        - uri: lb://AUTH-SERVICE
+        - predicates:
+        - Path=/auth/** # Example predicate to match requests
+        - filters:
+        - AuthenticationFilter
+        - id: INVENTORY-SERVICE
+          uri: lb://INVENTORY-SERVICE
+          predicates:
+            - Path=/inventory/** # Example predicate to match requests
+          filters:
+            - AuthenticationFilter
+        - id: NOTIFICATION-SERVICE
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/notification/** # Example predicate to match requests
+          filters:
+            - AuthenticationFilter
+        - id: ORDER-SERVICE
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=/order/** # Example predicate to match requests
+          filters:
+            - AuthenticationFilter
+        - id: PAYMENT-SERVICE
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/payment/** # Example predicate to match requests
+          filters:
+            - AuthenticationFilter
+        - id: PRODUCT-SERVICE
+          uri: lb://PRODUCT-SERVICE
+          predicates:
+            - Path=/product/**  # Example predicate to match requests starting with /question
+          filters:
+            - AuthenticationFilter
+        - id: USER-SERVICE
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user/**  # Example predicate to match requests starting with /quiz
+          filters:
+            - AuthenticationFilter
