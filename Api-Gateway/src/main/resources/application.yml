@@ -13,11 +13,11 @@ spring:
             allowedHeaders: "*"
       routes:
         - id: AUTH-SERVICE
-        - uri: lb://AUTH-SERVICE
-        - predicates:
-        - Path=/auth/** # Example predicate to match requests
-        - filters:
-        - AuthenticationFilter
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/auth/** # Example predicate to match requests
+          filters:
+            - AuthenticationFilter
         - id: INVENTORY-SERVICE
           uri: lb://INVENTORY-SERVICE
           predicates:

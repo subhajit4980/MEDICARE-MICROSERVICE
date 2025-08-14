@@ -11,10 +11,10 @@ public class RouteValidator {
 
     // List of endpoints that are open (do NOT require authentication)
     public static final List<String> openApiEndpoints = List.of(
-            "/auth/signIn",    // User login endpoint
-            "/auth/signUp",    // User registration endpoint
-            "/auth/validate",  // Token validation (usually for frontend)
-            "/eureka"          // Eureka service registry (should remain open)
+            "/api/auth/signIn",    // User login endpoint
+            "/api/auth/signUp",    // User registration endpoint
+            "/api/auth/validate",  // Token validation (usually for frontend)
+            "/api/eureka"          // Eureka service registry (should remain open)
     );
 
     /**
