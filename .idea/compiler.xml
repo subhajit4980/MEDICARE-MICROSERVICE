@@ -12,7 +12,7 @@
         </processorPath>
         <module name="Service-Registry" />
       </profile>
-      <profile name="Annotation profile for Api-Gateway" enabled="true">
+      <profile name="Annotation profile for Auth-Service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -21,8 +21,8 @@
         </processorPath>
         <module name="Inventory-Service" />
         <module name="Order-Service" />
-        <module name="Payment-Service" />
         <module name="Auth-Service" />
+        <module name="Payment-Service" />
         <module name="Notification-Service" />
         <module name="Api-Gateway" />
         <module name="Product-Service" />
