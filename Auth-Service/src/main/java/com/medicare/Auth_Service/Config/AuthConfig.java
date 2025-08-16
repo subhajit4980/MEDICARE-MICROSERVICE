@@ -34,15 +34,11 @@ public class AuthConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // Configuring exception handling, session management, and authorization rules
         http.exceptionHandling(exception -> exception.authenticationEntryPoint(point))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                                .requestMatchers("/api/auth/signUp","/api/auth/signIn","/api/auth/validate","/api/auth/test","/api/auth/revokeUserToken").permitAll() // Permit access to public URLs
-                                .anyRequest().authenticated() // Require authentication for any other requests
+                                .anyRequest().permitAll()
                 );
         // Adding custom authentication provider
         http.authenticationProvider(authenticationProvider());
-//        http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
-
         // Configuring CSRF and CORS
         http.csrf(AbstractHttpConfigurer::disable).cors(cors -> new CorsConfig());
         // Building and returning the configured security filter chain
