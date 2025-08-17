@@ -14,6 +14,8 @@ public class RouteValidator {
             "/api/auth/signIn",    // User login endpoint
             "/api/auth/signUp",    // User registration endpoint
             "/api/auth/validate",  // Token validation (usually for frontend)
+            "/api/auth/send-otp",
+            "/api/auth/verify-otp",
             "/api/eureka"          // Eureka service registry (should remain open)
     );
 

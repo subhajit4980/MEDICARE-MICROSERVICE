@@ -16,6 +16,7 @@ public class NotificationController {
             @RequestParam String phoneNumber,
             @RequestParam String message
     ) {
+        System.out.println(phoneNumber);
         return notificationService.sendSms(phoneNumber, message);
     }
 }
