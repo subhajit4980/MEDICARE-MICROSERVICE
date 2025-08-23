@@ -1,0 +1,23 @@
+server:
+  port: 9000
+
+app:
+  issuer: https://your-auth-host            # must be HTTPS in prod; match Gateway check
+  audience: medicare-api
+  access-token-mins: 15
+  refresh-token-days: 7
+  jwks:
+    key-id: key-1                           # rotate by changing kid; keep old pub keys served
+
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope: openid, profile, email
+        provider:
+          google:
+            issuer-uri: https://accounts.google.com

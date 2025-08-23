@@ -41,6 +41,16 @@ public class JwtUtils {
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
+    public String generateTokenForOauth2(String email,String name)
+    {
+        String token =Jwts.builder().setSubject(email)
+                .claim("name", name)
+                . setIssuedAt(new Date(System.currentTimeMillis()))
+            .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+            .signWith(getSignKey(), SignatureAlgorithm.HS256)
+            .compact();
+        return token;
+    }
 
     private Key getSignKey() {
         byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);

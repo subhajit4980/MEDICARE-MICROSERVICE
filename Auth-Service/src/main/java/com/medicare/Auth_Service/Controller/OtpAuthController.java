@@ -1,7 +1,6 @@
 package com.medicare.Auth_Service.Controller;
 
-import com.medicare.Auth_Service.DTO.Request.OtpVerifyRequest;
-import com.medicare.Auth_Service.Services.OtpService;
+import com.medicare.Auth_Service.Services.OTP_SERVICE.OtpService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

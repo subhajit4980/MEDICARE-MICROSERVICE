@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/MEDICARE-MICROSERVICE.iml" filepath="$PROJECT_DIR$/.idea/MEDICARE-MICROSERVICE.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Medicare-microservice.iml" filepath="$PROJECT_DIR$/.idea/Medicare-microservice.iml" />
     </modules>
   </component>
 </project>

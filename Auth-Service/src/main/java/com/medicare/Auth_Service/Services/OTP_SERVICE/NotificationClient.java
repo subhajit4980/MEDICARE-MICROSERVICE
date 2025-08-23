@@ -1,4 +1,4 @@
-package com.medicare.Auth_Service.Services;
+package com.medicare.Auth_Service.Services.OTP_SERVICE;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;

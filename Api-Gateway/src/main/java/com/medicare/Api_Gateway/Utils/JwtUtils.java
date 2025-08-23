@@ -17,4 +17,10 @@ public class JwtUtils {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET);
         return Keys.hmacShaKeyFor(keyBytes);
     }
+    public boolean isJwt(String token) {
+        if (token == null) return false;
+        String[] parts = token.split("\\.");
+        return parts.length == 3; // JWT always has 3 parts
+    }
+
 }
