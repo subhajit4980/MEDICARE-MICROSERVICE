@@ -1,9 +1,8 @@
 package com.medicare.Auth_Service.Config;
 
-import com.medicare.Auth_Service.Services.AuthEntryPointJwt;
+import com.medicare.Auth_Service.Services.TokenService.AuthEntryPointJwt;
 import com.medicare.Auth_Service.Services.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,9 +15,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
@@ -28,7 +24,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 public class AuthConfig {
 
     private final AuthEntryPointJwt point;
-    private final OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService;
+//    private final OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService;
     private final AuthenticationSuccessHandler oauth2SuccessHandler;
 
 
@@ -43,11 +39,11 @@ public class AuthConfig {
         // Configuring exception handling, session management, and authorization rules
         http.exceptionHandling(exception -> exception.authenticationEntryPoint(point))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**" ,"/.well-known/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .oauth2Login(o -> o
-                        .userInfoEndpoint(u -> u.userService(oAuth2UserService))
+//                        .userInfoEndpoint(u -> u.userService(oAuth2UserService))
                         .successHandler(oauth2SuccessHandler)
                 );
         // Adding custom authentication provider

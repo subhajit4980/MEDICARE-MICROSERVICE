@@ -1,4 +1,4 @@
-package com.medicare.Auth_Service.Services;
+package com.medicare.Auth_Service.Services.TokenService;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
