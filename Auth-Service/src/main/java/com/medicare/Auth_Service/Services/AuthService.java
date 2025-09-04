@@ -2,6 +2,7 @@ package com.medicare.Auth_Service.Services;
 
 import com.medicare.Auth_Service.DTO.Request.*;
 import com.medicare.Auth_Service.DTO.Response.AuthResponse;
+import com.medicare.Auth_Service.DTO.Response.UserDTO;
 import com.medicare.Auth_Service.Exception.UserException;
 import com.medicare.Auth_Service.Model.*;
 import com.medicare.Auth_Service.Repositories.*;
@@ -69,21 +70,20 @@ public class AuthService {
                 .role(request.getRole())
                 .build();
 
+        // Generate tokens
+        String access = jwtService.issueAccessToken(user);
+        String refresh = jwtService.issueRefreshToken(user.getUserId());
         // Save to DB
         User saved = repository.save(user);
 
-        // Generate tokens
-        String access = jwtService.issueAccessToken(saved);
-        String refresh = jwtService.issueRefreshToken(saved.getUserId());
-
         // Save tokens to DB + set refresh cookie
-        tokenService.saveUserToken(saved, access, refresh);
+        tokenService.saveUserToken(user, access, refresh);
         tokenService.storeRefreshCookie(refresh, response);
-
+        UserDTO dto = modelMapper.map(saved, UserDTO.class);
         // Return response
         return AuthResponse.builder()
                 .accessToken(access)
-                .user(saved)
+                .user(dto)
                 .build();
     }
 
@@ -110,8 +110,8 @@ public class AuthService {
         // Save + set refresh cookie
         tokenService.saveUserToken(user, access, refresh);
         tokenService.storeRefreshCookie(refresh, response);
-
-        return AuthResponse.builder().accessToken(access).user(user).build();
+        UserDTO dto = modelMapper.map(user, UserDTO.class);
+        return AuthResponse.builder().accessToken(access).user(dto).build();
     }
 
     /**

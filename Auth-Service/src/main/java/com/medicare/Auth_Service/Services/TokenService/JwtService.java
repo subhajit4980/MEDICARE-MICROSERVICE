@@ -1,5 +1,6 @@
 package com.medicare.Auth_Service.Services.TokenService;
 
+import com.medicare.Auth_Service.Model.Enum.Role;
 import com.medicare.Auth_Service.Model.User;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.RSASSASigner;

@@ -16,7 +16,7 @@ public class SignUpRequest {
     @Size(max = 50)
     @Email
     private String email;
-    private Role role;
+    private Role role=Role.USER;
     @NotBlank
     @Size(min = 6, max = 40)
     private String password;

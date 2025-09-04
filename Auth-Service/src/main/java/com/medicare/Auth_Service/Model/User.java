@@ -4,6 +4,7 @@ import com.medicare.Auth_Service.Model.Enum.Role;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -33,14 +34,11 @@ public class User{
     private String email;
     @Size(min = 8)
     private String password;
-    @NotBlank
+    @NotNull
     private Boolean verified =false;
-
-    @NotBlank
+    @NotNull
     private Date creationDate =new Date();
-
     private String GoogleSub;
-
     @Enumerated(EnumType.STRING)
     private Role role;
 }

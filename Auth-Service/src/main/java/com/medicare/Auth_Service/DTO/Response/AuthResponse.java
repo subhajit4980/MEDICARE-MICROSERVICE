@@ -15,5 +15,5 @@ public class AuthResponse {
     @JsonProperty("access_token")
     private String accessToken;
     @JsonProperty("User_Details")
-    private User user;
+    private UserDTO user;
 }
