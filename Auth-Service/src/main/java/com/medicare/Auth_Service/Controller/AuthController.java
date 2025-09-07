@@ -16,7 +16,7 @@ import java.io.IOException;
 
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("api/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor // Use Lombok to inject AuthService
 public class AuthController {
 

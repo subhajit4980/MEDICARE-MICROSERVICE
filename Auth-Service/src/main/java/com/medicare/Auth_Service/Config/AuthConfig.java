@@ -39,8 +39,9 @@ public class AuthConfig {
         // Configuring exception handling, session management, and authorization rules
         http.exceptionHandling(exception -> exception.authenticationEntryPoint(point))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**" ,"/.well-known/**").permitAll()
-                                .anyRequest().authenticated()
+//                                .requestMatchers("/auth/signUp", "/auth/signIn", "/auth/google-login","/auth/.well-known/**","/auth/validate").permitAll()
+//                                .requestMatchers( "/auth/revokeUserToken").authenticated()
+                                .anyRequest().permitAll()
                 )
                 .oauth2Login(o -> o
 //                        .userInfoEndpoint(u -> u.userService(oAuth2UserService))

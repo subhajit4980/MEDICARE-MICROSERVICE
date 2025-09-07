@@ -8,6 +8,9 @@ app:
   refresh-token-days: 7                # Token validity time in days for Refresh Tokens
   jwks:
     key-id: auth-key-2025              # Unique key ID (kid) for JWT signing; rotate keys by changing this
+    rsa:
+      public-key-b64: ${PUBLIC_KEY:}
+      private-key-b64: ${PRIVATE_KEY:}
 
 spring:
   security:
