@@ -1,7 +1,6 @@
 package com.medicare.Auth_Service.Repositories;
 
 
-import com.medicare.Auth_Service.Model.AccessToken;
 import com.medicare.Auth_Service.Model.RefreshToken;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;

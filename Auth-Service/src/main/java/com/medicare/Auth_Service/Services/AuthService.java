@@ -1,26 +1,34 @@
 package com.medicare.Auth_Service.Services;
 
-import com.medicare.Auth_Service.DTO.Request.*;
+import com.medicare.Auth_Service.DTO.Request.SignInRequest;
+import com.medicare.Auth_Service.DTO.Request.SignUpRequest;
 import com.medicare.Auth_Service.DTO.Response.AuthResponse;
 import com.medicare.Auth_Service.DTO.Response.UserDTO;
 import com.medicare.Auth_Service.Exception.UserException;
-import com.medicare.Auth_Service.Model.*;
-import com.medicare.Auth_Service.Repositories.*;
+import com.medicare.Auth_Service.Model.User;
+import com.medicare.Auth_Service.Repositories.AccessTokenRepository;
+import com.medicare.Auth_Service.Repositories.RefreshTokenRepository;
+import com.medicare.Auth_Service.Repositories.UserRepository;
 import com.medicare.Auth_Service.Services.TokenService.JwtService;
 import com.medicare.Auth_Service.Services.TokenService.TokenService;
 import com.medicare.Auth_Service.Utils.Common;
-import jakarta.servlet.http.*;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.*;
-import org.springframework.security.authentication.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Date;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -149,7 +157,10 @@ public class AuthService {
      */
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
         // Revoke all active tokens for this user (optional)
-        try { tokenService.revokeAllUserTokens(request); } catch (Exception ignored) {}
+        try {
+            tokenService.revokeAllUserTokens(request);
+        } catch (Exception ignored) {
+        }
 
         // Delete refresh token cookie
         Cookie cookie = new Cookie("refreshToken", null);

@@ -1,7 +1,7 @@
 package com.medicare.Auth_Service.Config;
 
-import com.medicare.Auth_Service.Services.TokenService.AuthEntryPointJwt;
 import com.medicare.Auth_Service.Services.CustomUserDetailsService;
+import com.medicare.Auth_Service.Services.TokenService.AuthEntryPointJwt;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,12 +24,12 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 public class AuthConfig {
 
     private final AuthEntryPointJwt point;
-//    private final OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService;
+    //    private final OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService;
     private final AuthenticationSuccessHandler oauth2SuccessHandler;
 
 
     @Bean
-    public UserDetailsService userDetailsService(){
+    public UserDetailsService userDetailsService() {
         return new CustomUserDetailsService();
     }
 
@@ -45,7 +45,7 @@ public class AuthConfig {
                 )
                 .oauth2Login(o -> o
 //                        .userInfoEndpoint(u -> u.userService(oAuth2UserService))
-                        .successHandler(oauth2SuccessHandler)
+                                .successHandler(oauth2SuccessHandler)
                 );
         // Adding custom authentication provider
         http.authenticationProvider(authenticationProvider());
@@ -61,8 +61,8 @@ public class AuthConfig {
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(){
-        DaoAuthenticationProvider authenticationProvider=new DaoAuthenticationProvider();
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(userDetailsService());
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;

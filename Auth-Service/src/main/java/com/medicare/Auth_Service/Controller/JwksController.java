@@ -1,8 +1,11 @@
 package com.medicare.Auth_Service.Controller;
+
 import com.nimbusds.jose.jwk.JWKSet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
@@ -10,11 +13,14 @@ import java.util.Map;
 @RequestMapping("/auth")
 public class JwksController {
     private final JWKSet jwkSet;
-    @Value("${app.issuer}") private String issuer;
+    @Value("${app.issuer}")
+    private String issuer;
 
-    public JwksController(JWKSet jwkSet) { this.jwkSet = jwkSet; }
+    public JwksController(JWKSet jwkSet) {
+        this.jwkSet = jwkSet;
+    }
 
-    @GetMapping(value="/.well-known/jwks.json" ,produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/.well-known/jwks.json", produces = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, Object> jwks() {
         return jwkSet.toPublicJWKSet().toJSONObject();
     }

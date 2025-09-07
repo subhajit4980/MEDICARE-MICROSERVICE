@@ -10,9 +10,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class GlobalExceptionHandler {
     @ExceptionHandler(UserException.class)
     public ResponseEntity<ErrorResponse> handleUserException(UserException ex) {
-        ErrorResponse errorResponse = new ErrorResponse(ex.getStatus(),ex.getStatusCode(),ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(ex.getStatus(), ex.getStatusCode(), ex.getMessage());
         return new ResponseEntity<>(errorResponse, ex.getStatusCode());
     }
+
     // Handle ALL other exceptions globally
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex) {

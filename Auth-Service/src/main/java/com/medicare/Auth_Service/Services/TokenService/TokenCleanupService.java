@@ -4,9 +4,10 @@ import com.medicare.Auth_Service.Model.AccessToken;
 import com.medicare.Auth_Service.Model.RefreshToken;
 import com.medicare.Auth_Service.Repositories.AccessTokenRepository;
 import com.medicare.Auth_Service.Repositories.RefreshTokenRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import jakarta.annotation.PostConstruct;
+
 import java.util.ArrayList;
 import java.util.List;
 

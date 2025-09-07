@@ -1,4 +1,3 @@
-
 # 🆘 Medicare Microservices Platform
 
 This document is the **developer guide** for the **Medicare Microservices Application**.  
@@ -8,20 +7,22 @@ It covers architecture, authentication (JWT + Google OAuth2), RSA key usage, and
 
 ## 📦 Microservices Architecture
 
-The system is built with **Spring Boot Microservices**, integrated with **AWS** for infrastructure and **Redis** for caching.
+The system is built with **Spring Boot Microservices**, integrated with **AWS** for infrastructure and **Redis** for
+caching.
 
 ### Core Components
-- **API Gateway** – Routes requests, validates tokens (JWT + Google OAuth2).  
-- **Service Registry (Eureka)** – Enables dynamic service discovery.  
-- **Auth Service** – Issues JWTs, integrates Google OAuth2, manages refresh tokens.  
-- **User Service** – Manages user profiles.  
-- **Product Service** – Handles medicine/product catalog.  
-- **Order Service** – Manages order placement and lifecycle.  
-- **Inventory Service** – Tracks stock availability.  
-- **Notification Service** – Sends SMS, emails, and push notifications.  
-- **Payment Service** – Processes payments.  
-- **Redis** – Caches tokens, manages revocations.  
-- **AWS Services** – Hosts secrets, deploys infrastructure, supports scaling.  
+
+- **API Gateway** – Routes requests, validates tokens (JWT + Google OAuth2).
+- **Service Registry (Eureka)** – Enables dynamic service discovery.
+- **Auth Service** – Issues JWTs, integrates Google OAuth2, manages refresh tokens.
+- **User Service** – Manages user profiles.
+- **Product Service** – Handles medicine/product catalog.
+- **Order Service** – Manages order placement and lifecycle.
+- **Inventory Service** – Tracks stock availability.
+- **Notification Service** – Sends SMS, emails, and push notifications.
+- **Payment Service** – Processes payments.
+- **Redis** – Caches tokens, manages revocations.
+- **AWS Services** – Hosts secrets, deploys infrastructure, supports scaling.
 
 ---
 
@@ -31,18 +32,20 @@ The **Auth Service** uses **RSA asymmetric cryptography** (`RS256`) for signing 
 Only the private key signs tokens, while all other services use the public key for validation.
 
 ### Key Handling
-- **Private Key** → Stored in environment variables or AWS Secrets Manager.  
-- **Public Key** → Exposed through a JWKS endpoint for verification.  
-- **kid** → Key ID. Used in JWT headers to identify which key signed the token.  
-- **JWKS** → JSON Web Key Set. Public keys in JSON format, consumed by other services.  
-- **issuer** → Identifies the Auth Service (`http://localhost:9000` in dev).  
-- **audience** → Identifies the target application (`medicare-api`).  
+
+- **Private Key** → Stored in environment variables or AWS Secrets Manager.
+- **Public Key** → Exposed through a JWKS endpoint for verification.
+- **kid** → Key ID. Used in JWT headers to identify which key signed the token.
+- **JWKS** → JSON Web Key Set. Public keys in JSON format, consumed by other services.
+- **issuer** → Identifies the Auth Service (`http://localhost:9000` in dev).
+- **audience** → Identifies the target application (`medicare-api`).
 
 ---
 
 ## ⚙️ RSA Configuration Code
 
 ### `KeyConfig.java`
+
 ```java
 @Configuration
 @RequiredArgsConstructor
@@ -141,7 +144,6 @@ GET /auth/test               # Simple health/test endpoint
 
 ---
 
-
 # 🔐 Authentication Flow (JWT + Refresh Token)
 
 This project uses **JWT authentication** with **refresh token rotation** for secure session management.
@@ -149,6 +151,7 @@ This project uses **JWT authentication** with **refresh token rotation** for sec
 ---
 
 ## 1. User Login
+
 - User logs in with **username/password** or via **Google OAuth**.
 - The **Auth Service** generates:
     - **Access Token (JWT)** → short-lived
@@ -157,6 +160,7 @@ This project uses **JWT authentication** with **refresh token rotation** for sec
 ---
 
 ## 2. Accessing APIs
+
 - User calls the **API Gateway / Resource Server** with the **Access Token**.
 - Gateway validates the token (signature + expiry).
 
@@ -166,6 +170,7 @@ This project uses **JWT authentication** with **refresh token rotation** for sec
 ---
 
 ## 3. Token Refresh
+
 - When the access token expires, the client calls the **Refresh API**.
 - The **refresh token (from cookie)** is sent.
 - Auth Service checks:
@@ -184,6 +189,7 @@ This project uses **JWT authentication** with **refresh token rotation** for sec
 ---
 
 ## 4. Logout
+
 - When user logs out, all refresh tokens for that user are revoked in the DB.
 
 ---
@@ -222,6 +228,7 @@ sequenceDiagram
     U->>A: Logout
     A->>DB: Revoke all refresh tokens
 ```
+
 ---
 
 ## 🔎 Hybrid Login Flow (Local + Google OAuth2)

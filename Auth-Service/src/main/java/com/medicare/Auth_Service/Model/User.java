@@ -18,8 +18,8 @@ import java.util.Date;
 @AllArgsConstructor
 @Getter
 @Setter
-@Document(collection = "users") // Collection name in MongoDB
-public class User{
+@Document(collection = "Ucommitsers") // Collection name in MongoDB
+public class User {
     @Id
     private String userId;
 
@@ -35,9 +35,9 @@ public class User{
     @Size(min = 8)
     private String password;
     @NotNull
-    private Boolean verified =false;
+    private Boolean verified = false;
     @NotNull
-    private Date creationDate =new Date();
+    private Date creationDate = new Date();
     private String GoogleSub;
     @Enumerated(EnumType.STRING)
     private Role role;

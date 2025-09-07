@@ -1,7 +1,6 @@
 package com.medicare.Auth_Service.DTO.Response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.medicare.Auth_Service.Model.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

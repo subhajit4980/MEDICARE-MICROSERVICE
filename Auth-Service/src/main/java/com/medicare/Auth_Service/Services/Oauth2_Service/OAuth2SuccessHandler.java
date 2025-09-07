@@ -2,7 +2,6 @@ package com.medicare.Auth_Service.Services.Oauth2_Service;
 
 import com.medicare.Auth_Service.Model.User;
 import com.medicare.Auth_Service.Repositories.UserRepository;
-import com.medicare.Auth_Service.Services.AuthService;
 import com.medicare.Auth_Service.Services.TokenService.JwtService;
 import com.medicare.Auth_Service.Services.TokenService.TokenService;
 import jakarta.servlet.http.HttpServletRequest;

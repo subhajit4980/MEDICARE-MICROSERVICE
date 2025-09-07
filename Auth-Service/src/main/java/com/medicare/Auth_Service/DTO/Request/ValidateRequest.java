@@ -3,6 +3,7 @@ package com.medicare.Auth_Service.DTO.Request;
 import com.medicare.Auth_Service.Model.Enum.Role;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+
 @Getter
 @Setter
 @AllArgsConstructor

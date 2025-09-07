@@ -1,4 +1,5 @@
 package com.medicare.Auth_Service.Model;
+
 import com.medicare.Auth_Service.Model.Enum.TokenType;
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;

@@ -3,7 +3,6 @@ package com.medicare.Auth_Service.Services.TokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.medicare.Auth_Service.DTO.Response.AuthResponse;
 import com.medicare.Auth_Service.Exception.UserException;
-import com.medicare.Auth_Service.Model.AccessToken;
 import com.medicare.Auth_Service.Model.Enum.TokenType;
 import com.medicare.Auth_Service.Model.RefreshToken;
 import com.medicare.Auth_Service.Model.User;
@@ -16,14 +15,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Date;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

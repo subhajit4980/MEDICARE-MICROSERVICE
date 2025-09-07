@@ -6,10 +6,10 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class SmsService {
-    private  final SmsSender smsSender;
-    public String sendSms(String phoneNumber, String message)
-    {
-        System.out.println("phone:"+phoneNumber +" , message: "+message);
-        return smsSender.sendSms(phoneNumber,message);
+    private final SmsSender smsSender;
+
+    public String sendSms(String phoneNumber, String message) {
+        System.out.println("phone:" + phoneNumber + " , message: " + message);
+        return smsSender.sendSms(phoneNumber, message);
     }
 }

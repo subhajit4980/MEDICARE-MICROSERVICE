@@ -1,6 +1,5 @@
 package com.medicare.Auth_Service.Services.TokenService;
 
-import com.medicare.Auth_Service.Model.Enum.Role;
 import com.medicare.Auth_Service.Model.User;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.RSASSASigner;
@@ -26,10 +25,14 @@ public class JwtService {
     private final RSAKey rsaKey;
 
     // Injected values from application properties
-    @Value("${app.issuer}") private String issuer;
-    @Value("${app.audience:medicare-api}") private String audience;
-    @Value("${app.access-token-mins:15}") private long accessMins;
-    @Value("${app.refresh-token-days:7}") private long refreshDays;
+    @Value("${app.issuer}")
+    private String issuer;
+    @Value("${app.audience:medicare-api}")
+    private String audience;
+    @Value("${app.access-token-mins:15}")
+    private long accessMins;
+    @Value("${app.refresh-token-days:7}")
+    private long refreshDays;
 
     /**
      * Issues a signed Access Token for a given user.
@@ -71,9 +74,9 @@ public class JwtService {
 
     /**
      * Parses and validates a token:
-     *  1. Verify digital signature with RSA public key.
-     *  2. Check issuer matches configured value.
-     *  3. Check expiry (must not be expired).
+     * 1. Verify digital signature with RSA public key.
+     * 2. Check issuer matches configured value.
+     * 3. Check expiry (must not be expired).
      * Returns claims if valid, otherwise throws SecurityException.
      */
     public JWTClaimsSet parseAndValidate(String jwt) throws Exception {

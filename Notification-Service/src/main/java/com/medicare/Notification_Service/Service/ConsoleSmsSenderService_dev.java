@@ -9,6 +9,6 @@ public class ConsoleSmsSenderService_dev implements SmsSender {
     @Override
     public String sendSms(String phoneNumber, String message) {
         System.out.println("DEV MODE - sms for " + phoneNumber + " is: " + message);
-        return  "SMS send";
+        return "SMS send";
     }
 }

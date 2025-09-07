@@ -11,7 +11,6 @@ import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.Locale;
 
 
@@ -28,10 +27,11 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         String email = user.<String>getAttribute("email");
         String sub = user.<String>getAttribute("sub");
-        String firstName=user.<String>getAttribute("given_name");
-        String lastName=user.<String>getAttribute("family_name");
+        String firstName = user.<String>getAttribute("given_name");
+        String lastName = user.<String>getAttribute("family_name");
 
-        if (email == null) throw new OAuth2AuthenticationException(new OAuth2Error("invalid_userinfo"), "Email missing");
+        if (email == null)
+            throw new OAuth2AuthenticationException(new OAuth2Error("invalid_userinfo"), "Email missing");
 
         String norm = email.trim().toLowerCase(Locale.ROOT);
 
@@ -49,7 +49,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         });
 
         // If you add a googleSub column to User, set it here:
-         entity.setGoogleSub(sub);
+        entity.setGoogleSub(sub);
         System.out.println(sub);
         userRepository.save(entity);
         return user; // Spring will pass this to successHandler

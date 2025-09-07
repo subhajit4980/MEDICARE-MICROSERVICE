@@ -18,11 +18,11 @@
 //        String res=otpService.requestOtp(phoneNumber);
 //        return ResponseEntity.ok(res);
 //    }
-////    @PostMapping("/verify-otp")
-////    ResponseEntity<String> verify_Otp(@RequestBody OtpVerifyRequest otpVerifyRequest)
-////    {
-////        Boolean res=otpService.verify(otpVerifyRequest);
-////        return ResponseEntity.ok(res?"Wrong Verification Code":"Successfully Verified");
-////    }
+/// /    @PostMapping("/verify-otp")
+/// /    ResponseEntity<String> verify_Otp(@RequestBody OtpVerifyRequest otpVerifyRequest)
+/// /    {
+/// /        Boolean res=otpService.verify(otpVerifyRequest);
+/// /        return ResponseEntity.ok(res?"Wrong Verification Code":"Successfully Verified");
+/// /    }
 //
 //}

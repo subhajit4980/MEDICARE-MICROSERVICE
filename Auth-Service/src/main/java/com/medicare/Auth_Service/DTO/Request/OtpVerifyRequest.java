@@ -15,5 +15,5 @@ public class OtpVerifyRequest {
     @NotBlank
     private String otp;
     @NotBlank
-    private  String sessionId;
+    private String sessionId;
 }

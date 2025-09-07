@@ -17,6 +17,7 @@ public class CorsConfig implements CorsConfigurationSource {
 
     /**
      * Get CORS configuration based on the incoming HTTP request.
+     *
      * @param request The incoming HTTP request
      * @return CorsConfiguration object representing the CORS configuration
      **/

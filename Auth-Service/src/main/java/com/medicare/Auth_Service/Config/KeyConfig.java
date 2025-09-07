@@ -9,13 +9,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.oauth2.jwt.*;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.security.spec.*;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 @Configuration
@@ -26,6 +30,7 @@ public class KeyConfig {
 
     @Value("${app.jwks.key-id:auth-key-2025}")
     private String keyId;
+
     @Bean
     public RSAPublicKey rsaPublicKey() throws Exception {
         return loadPublicKey(rsaProps.publicKeyB64());
@@ -81,9 +86,9 @@ public class KeyConfig {
 
     /**
      * Accepts:
-     *  - raw PEM text (contains -----BEGIN ...-----)
-     *  - base64 of DER bytes (single-line)
-     *  - base64 of entire PEM file (decodes to PEM text)
+     * - raw PEM text (contains -----BEGIN ...-----)
+     * - base64 of DER bytes (single-line)
+     * - base64 of entire PEM file (decodes to PEM text)
      */
     private byte[] extractDerBytes(String input) {
         if (input == null || input.isBlank()) {

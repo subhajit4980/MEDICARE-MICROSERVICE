@@ -1,4 +1,5 @@
 package com.medicare.Auth_Service.DTO.Response;
+
 import com.medicare.Auth_Service.Model.Enum.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

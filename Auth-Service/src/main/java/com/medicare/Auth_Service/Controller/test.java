@@ -13,8 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class test {
     @GetMapping("/test")
-    public ResponseEntity<?> test()
-    {
+    public ResponseEntity<?> test() {
         return ResponseEntity.ok("TEST");
     }
 }
