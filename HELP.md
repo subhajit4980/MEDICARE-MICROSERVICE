@@ -221,7 +221,7 @@ sequenceDiagram
 
     U->>A: Logout
     A->>DB: Revoke all refresh tokens
-
+```
 ---
 
 ## 🔎 Hybrid Login Flow (Local + Google OAuth2)
