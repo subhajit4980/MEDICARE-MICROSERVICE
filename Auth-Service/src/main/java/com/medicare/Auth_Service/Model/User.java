@@ -18,7 +18,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Getter
 @Setter
-@Document(collection = "Ucommitsers") // Collection name in MongoDB
+@Document(collection = "Users") // Collection name in MongoDB
 public class User {
     @Id
     private String userId;
