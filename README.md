@@ -258,7 +258,69 @@ flowchart TD
 * **Redis** → Stores active refresh tokens and revoked token lists.
 
 ---
+```mermaid
+flowchart TD
+    %% Users
+    U[User / Frontend] --> GW[API Gateway]
 
+    %% Gateway routes
+    GW --> AUTH[Auth Service]
+    GW --> USER[User Service]
+    GW --> PROD[Product Service]
+    GW --> ORD[Order Service]
+    GW --> INV[Inventory Service]
+    GW --> PAY[Payment Service]
+    GW --> NOTI[Notification Service]
+
+    %% Auth dependencies
+    AUTH --> REDIS[(Redis Cache)]
+    AUTH --> REG[Service Registry]
+    AUTH --> AWS[(AWS Services)]
+
+    %% MongoDB
+    USER --> MONGO[(MongoDB)]
+    PROD --> MONGO
+    ORD --> MONGO
+    INV --> MONGO
+
+    %% Other service dependencies
+    USER --> REG
+    PROD --> INV
+    PROD --> REG
+    ORD --> USER
+    ORD --> PROD
+    ORD --> INV
+    ORD --> PAY
+    ORD --> NOTI
+    ORD --> REG
+    INV --> REG
+    PAY --> AWS
+    PAY --> NOTI
+    PAY --> REG
+    NOTI --> AWS
+    NOTI --> REG
+
+    %% Colors & Black Text
+    style U fill:#f9f,stroke:#333,stroke-width:2px,color:#000
+    style GW fill:#ffb347,stroke:#333,stroke-width:2px,color:#000
+    style AUTH fill:#ff6961,stroke:#333,stroke-width:2px,color:#000
+    style USER fill:#77dd77,stroke:#333,stroke-width:2px,color:#000
+    style PROD fill:#aec6cf,stroke:#333,stroke-width:2px,color:#000
+    style ORD fill:#fdfd96,stroke:#333,stroke-width:2px,color:#000
+    style INV fill:#84b6f4,stroke:#333,stroke-width:2px,color:#000
+    style PAY fill:#ffb6c1,stroke:#333,stroke-width:2px,color:#000
+    style NOTI fill:#cdb5ff,stroke:#333,stroke-width:2px,color:#000
+    style REDIS fill:#ffcccb,stroke:#333,stroke-width:2px,color:#000
+    style REG fill:#b0e0e6,stroke:#333,stroke-width:2px,color:#000
+    style AWS fill:#ffd700,stroke:#333,stroke-width:2px,color:#000
+    style MONGO fill:#40e0d0,stroke:#333,stroke-width:2px,color:#000
+
+    %% Organize flow (optional ranks)
+    classDef topLayer fill:#fff,stroke:none;
+    class U topLayer;
+
+```
+---
 ## 🚀 Deployment Notes
 
 * Run **Service Registry** before other services.
