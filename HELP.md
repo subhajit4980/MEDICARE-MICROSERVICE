@@ -189,22 +189,38 @@ This project uses **JWT authentication** with **refresh token rotation** for sec
 ---
 
 ## 🔎 Visual Flow
+
 ```mermaid
-flowchart TD
-    U[User] -->|Login (Password/Google)| A[Auth Service]
-    A -->|Access + Refresh Token| U
-    U -->|Access Token| API[API / Gateway]
-    API -->|Valid?| API
-    API -->|✅ Yes| U
-    API -->|❌ Expired| A
+sequenceDiagram
+    participant U as User
+    participant A as Auth Service
+    participant DB as Token DB
+    participant API as API/Gateway
 
-    A -->|Check Refresh Token| DB[(Token DB)]
-    DB -->|Valid| A
-    DB -->|Invalid| U
+    U->>A: Login (username/password or Google OAuth)
+    A->>DB: Store Refresh Token
+    A->>U: Return Access Token + Set Refresh Cookie
 
-    A -->|New Access + Refresh| U
-    U -->|Logout| A
-    A -->|Revoke Tokens| DB
+    U->>API: Call API with Access Token
+    API->>API: Validate Access Token (signature, expiry)
+
+    alt Access Token valid
+        API->>U: Return data ✅
+    else Access Token expired
+        U->>A: Send Refresh Token (cookie)
+        A->>A: Validate Refresh Token (signature, claims)
+        A->>DB: Check if exists & not revoked
+        alt Valid
+            A->>DB: Revoke old refresh token
+            A->>DB: Save new refresh token
+            A->>U: Return new Access Token + new Refresh Cookie
+        else Invalid/Revoked
+            A->>U: 401 Unauthorized ❌
+        end
+    end
+
+    U->>A: Logout
+    A->>DB: Revoke all refresh tokens
 
 ---
 
