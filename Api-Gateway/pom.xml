@@ -11,6 +11,7 @@
     <groupId>com.medicare</groupId>
     <artifactId>Api-Gateway</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
     <name>Api-Gateway</name>
     <description>API GATEWAY FOR MEDICARE</description>
     <url/>
@@ -88,6 +89,10 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
     </dependencies>
     <dependencyManagement>

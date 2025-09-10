@@ -12,6 +12,9 @@ import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jwt.SignedJWT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
@@ -32,13 +35,24 @@ public class JwtAuthGatewayFilterFactory extends AbstractGatewayFilterFactory<Jw
     private final RemoteJWKSet<SecurityContext> jwkSet;
     private final RouteValidator validator;
 
-    public JwtAuthGatewayFilterFactory(RouteValidator validator) throws Exception {
+    @Autowired
+    public JwtAuthGatewayFilterFactory(RouteValidator validator, LoadBalancerClient loadBalancerClient) throws Exception {
         super(Config.class);
         this.validator = validator;
+        // Dynamically resolve Auth-Service instance
+        ServiceInstance instance = loadBalancerClient.choose("auth-service");
+        if (instance == null) {
+            throw new IllegalStateException("No instance of auth-service found in Eureka");
+        }
+
+        String jwksUrl = String.format("http://%s:%d/auth/.well-known/jwks.json",
+                instance.getHost(), instance.getPort());
+
+        log.info("Resolved Auth-Service JWKS endpoint = {}", jwksUrl);
         log.info(">>> JwtAuthFilter initialized and registered");
         // Auth-Service JWKS endpoint (through Gateway)
         this.jwkSet = new RemoteJWKSet<>(
-                new URL("http://localhost:8765/auth-service/auth/.well-known/jwks.json"),
+                new URL(jwksUrl),
                 new com.nimbusds.jose.util.DefaultResourceRetriever(5000, 5000, 3600 * 1000)
         );
     }

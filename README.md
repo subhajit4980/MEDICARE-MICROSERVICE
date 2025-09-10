@@ -256,7 +256,36 @@ flowchart TD
 * **Access Token** → Short-lived, used to access APIs.
 * **Refresh Token** → Longer-lived, used to request new access tokens.
 * **Redis** → Stores active refresh tokens and revoked token lists.
+---
+```mermaid
+flowchart LR
+    subgraph AuthService
+        A1[Generate RSA Key Pair: Private & Public]
+        A2[Private Key → Sign JWT]
+        A3[Public Key → Expose via JWKS Endpoint]
+        A1 --> A2
+        A1 --> A3
+    end
 
+    subgraph Client
+        C1[Login Request]
+        C2[Receive JWT from AuthService]
+        C1 --> C2
+    end
+
+    subgraph APIGateway
+        G1[Incoming Request with Bearer Token]
+        G2[Parse JWT Header → Extract kid]
+        G3[Fetch JWKS from AuthService]
+        G4[Select JWK by kid]
+        G5[Convert JWK → RSA Public Key]
+        G6[Verify JWT Signature]
+        G7[Validate Expiry & Claims]
+        G8[Inject User Headers → Forward to Service]
+        G1 --> G2 --> G3 --> G4 --> G5 --> G6 --> G7 --> G8
+    end
+
+```
 ---
 ```mermaid
 flowchart TD
