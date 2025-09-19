@@ -40,5 +40,5 @@ public class User {
     private Date creationDate = new Date();
     private String GoogleSub;
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private Role role = Role.USER;
 }

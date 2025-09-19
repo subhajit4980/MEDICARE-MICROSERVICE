@@ -1,5 +1,6 @@
 package com.medicare.Auth_Service.Controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.medicare.Auth_Service.DTO.Request.SignInRequest;
 import com.medicare.Auth_Service.DTO.Request.SignUpRequest;
 import com.medicare.Auth_Service.DTO.Response.AuthResponse;
@@ -8,6 +9,7 @@ import com.medicare.Auth_Service.Services.TokenService.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,8 +25,14 @@ public class AuthController {
     private final TokenService tokenService;
 
     @PostMapping("/signUp")
-    public ResponseEntity<AuthResponse> signUpUser(@RequestBody SignUpRequest request, HttpServletResponse response) {
-        AuthResponse authResponse = authService.signUpUser(request, response);
+    public ResponseEntity<String> signUpUser(@RequestBody SignUpRequest request) throws JsonProcessingException {
+        String authResponse = authService.signUpUser(request);
+        return ResponseEntity.ok(authResponse);
+    }
+
+    @PostMapping("/verify-User")
+    public ResponseEntity<AuthResponse> verifyUser(@RequestParam String otp, @RequestParam String email, HttpServletResponse response) {
+        AuthResponse authResponse = authService.verifyUser(otp, email, response);
         return ResponseEntity.ok(authResponse);
     }
 
@@ -44,6 +52,13 @@ public class AuthController {
     public ResponseEntity<String> revokeUserToken(HttpServletRequest request) {
         String res = tokenService.revokeAllUserTokens(request);
         return ResponseEntity.ok(res);
+    }
+
+    @SneakyThrows
+    @PostMapping("/refreshToken")
+    public ResponseEntity<HttpServletResponse> refreshToken(HttpServletRequest request, HttpServletResponse response) {
+        tokenService.refreshAccessToken(request, response);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/google-login")

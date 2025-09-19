@@ -1,4 +1,4 @@
-package com.medicare.Notification_Service.Service;
+package com.medicare.Notification_Service.Service.SmsService;
 
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;

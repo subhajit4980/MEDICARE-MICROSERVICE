@@ -1,4 +1,4 @@
-package com.medicare.Notification_Service.Service;
+package com.medicare.Notification_Service.Service.SmsService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;

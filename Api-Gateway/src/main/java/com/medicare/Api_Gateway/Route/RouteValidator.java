@@ -1,4 +1,4 @@
-package com.medicare.Api_Gateway.Filter;
+package com.medicare.Api_Gateway.Route;
 
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
@@ -15,6 +15,8 @@ public class RouteValidator {
             "/auth/signUp",    // User registration endpoint
             "/auth/send-otp",
             "/auth/verify-otp",
+            "/auth/verify-User",
+            "/auth/refreshToken",
             "/auth/google-login",
             "/auth/.well-known/jwks.json",
             "/api/eureka"          // Eureka service registry (should remain open)

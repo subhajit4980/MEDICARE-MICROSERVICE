@@ -1,12 +1,18 @@
 package com.medicare.Auth_Service.Services.Oauth2_Service;
 
+import com.medicare.Auth_Service.DTO.Response.AuthResult;
+import com.medicare.Auth_Service.Model.Enum.Role;
 import com.medicare.Auth_Service.Model.User;
 import com.medicare.Auth_Service.Repositories.UserRepository;
+import com.medicare.Auth_Service.Services.AuthService;
+import com.medicare.Auth_Service.Services.NotificationClient;
 import com.medicare.Auth_Service.Services.TokenService.JwtService;
 import com.medicare.Auth_Service.Services.TokenService.TokenService;
+import com.medicare.Auth_Service.Services.UserRegistrationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -14,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
@@ -22,6 +29,8 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final TokenService tokenService;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final UserRegistrationService userRegistrationService;
 
     /**
      * This method gets called automatically when
@@ -38,36 +47,53 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         String norm = email.trim().toLowerCase(Locale.ROOT); // normalize email
         String firstName = oauth.getAttribute("given_name");
         String lastName = oauth.getAttribute("family_name");
-
+//        AuthResult authResult = null;
         // Check if user exists in DB, else create new
-        User user = userRepository.findByEmail(norm).orElseGet(() -> {
-            User u = new User();
-            u.setEmail(norm);
-            u.setVerified(true);
-            u.setFirstName(firstName);
-            u.setLastName(lastName);
-            // Assign default role if null
-            if (u.getRole() == null) {
-                u.setRole(com.medicare.Auth_Service.Model.Enum.Role.USER);
-            }
-            u.setGoogleSub(sub);
-            userRepository.save(u);
-            return u;
-        });
+        AuthResult authResult = userRepository.findByEmail(norm)
+                .map(u -> new AuthResult(u, jwtService.issueAccessToken(u)))
+                .orElseGet(() -> {
+                    User u = new User();
+                    u.setEmail(norm);
+                    u.setFirstName(firstName);
+                    u.setLastName(lastName);
+                    // Assign default role if null
+                    if (u.getRole() == null) {
+                        u.setRole(Role.USER);
+                    }
+                    u.setGoogleSub(sub);
+                    redisTemplate.opsForValue().set(norm, u, 60, TimeUnit.MINUTES);
+                    return userRegistrationService.finalizeRegistration(norm, response);
+                });
+//        User user = userRepository.findByEmail(norm).orElseGet(() -> {
+//            User u = new User();
+//            u.setEmail(norm);
+//            u.setFirstName(firstName);
+//            u.setLastName(lastName);
+//            // Assign default role if null
+//            if (u.getRole() == null) {
+//                u.setRole(Role.USER);
+//            }
+//            u.setGoogleSub(sub);
+//            redisTemplate.opsForValue().set(norm,u,5, TimeUnit.MINUTES);
+//            authResult=authService.saveUserAndNotify(norm,response);
+//            authResult.setUser(u);
+//            authResult.setAccessToken();
+//            return u;
+//        });
 
-        // Generate JWT tokens
-        String access = jwtService.issueAccessToken(user);
-        String refresh = jwtService.issueRefreshToken(user.getUserId());
-
-        // Save tokens (DB + Refresh cookie)
-        tokenService.saveUserToken(user, access, refresh);
-        tokenService.storeRefreshCookie(refresh, response);
-
-        // Debug log
-        System.out.println("Access: " + access + "\nRefresh: " + refresh);
+//        // Generate JWT tokens
+//        String access = jwtService.issueAccessToken(user);
+//        String refresh = jwtService.issueRefreshToken(user.getUserId());
+//
+//        // Save tokens (DB + Refresh cookie)
+//        tokenService.saveUserToken(user, access, refresh);
+//        tokenService.storeRefreshCookie(refresh, response);
+//
+//        // Debug log
+//        System.out.println("Access: " + access + "\nRefresh: " + refresh);
 
         // Send access token in response body as JSON
         response.setContentType("application/json");
-        response.getWriter().write("{\"accessToken\":\"" + access + "\"}");
+        response.getWriter().write("{\"accessToken\":\"" + authResult.getAccessToken() + "\"}");
     }
 }

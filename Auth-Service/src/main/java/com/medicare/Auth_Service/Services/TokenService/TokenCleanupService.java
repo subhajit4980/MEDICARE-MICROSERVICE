@@ -1,10 +1,9 @@
 package com.medicare.Auth_Service.Services.TokenService;
 
-import com.medicare.Auth_Service.Model.AccessToken;
 import com.medicare.Auth_Service.Model.RefreshToken;
-import com.medicare.Auth_Service.Repositories.AccessTokenRepository;
 import com.medicare.Auth_Service.Repositories.RefreshTokenRepository;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -15,21 +14,20 @@ import java.util.List;
  * Service responsible for cleaning up expired access and refresh tokens.
  * Runs automatically at startup and every 24 hours.
  */
+@RequiredArgsConstructor
 @Service
 public class TokenCleanupService {
 
-    private final AccessTokenRepository accessTokenRepo;
     private final RefreshTokenRepository refreshTokenRepo;
     private final JwtService jwtService; // utility class to validate token expiry
 
     // Constructor injection for repositories + jwt service
-    public TokenCleanupService(AccessTokenRepository accessTokenRepo,
-                               RefreshTokenRepository refreshTokenRepo,
-                               JwtService jwtService) {
-        this.accessTokenRepo = accessTokenRepo;
-        this.refreshTokenRepo = refreshTokenRepo;
-        this.jwtService = jwtService;
-    }
+//    public TokenCleanupService(
+//                               RefreshTokenRepository refreshTokenRepo,
+//                               JwtService jwtService) {
+//        this.refreshTokenRepo = refreshTokenRepo;
+//        this.jwtService = jwtService;
+//    }
 
     /**
      * Executes once right after the application starts.
@@ -47,26 +45,13 @@ public class TokenCleanupService {
 
     /**
      * Runs periodically (every 24 hours).
-     * - Collects all expired access & refresh tokens.
+     * - Collects all expired refresh tokens.
      * - Deletes them from the database.
      */
     @Scheduled(fixedRate = 24 * 60 * 60 * 1000) // 24 hours in milliseconds
     public void deleteExpiredTokens() {
         // Lists to store tokens that are expired
-        List<AccessToken> expiredAccessTokens = new ArrayList<>();
         List<RefreshToken> expiredRefreshTokens = new ArrayList<>();
-
-        // --- Check access tokens ---
-        accessTokenRepo.findAll().forEach(token -> {
-            try {
-                // If expired → add to deletion list
-                if (jwtService.isExpiredToken(token.getToken())) {
-                    expiredAccessTokens.add(token);
-                }
-            } catch (Exception e) {
-                System.err.println("❌ Error checking access token: " + e.getMessage());
-            }
-        });
 
         // --- Check refresh tokens ---
         refreshTokenRepo.findAll().forEach(token -> {
@@ -81,11 +66,6 @@ public class TokenCleanupService {
         });
 
         // --- Delete expired tokens ---
-        if (!expiredAccessTokens.isEmpty()) {
-            accessTokenRepo.deleteAll(expiredAccessTokens);
-            System.out.println("🗑️ Deleted " + expiredAccessTokens.size() + " expired access tokens");
-        }
-
         if (!expiredRefreshTokens.isEmpty()) {
             refreshTokenRepo.deleteAll(expiredRefreshTokens);
             System.out.println("🗑️ Deleted " + expiredRefreshTokens.size() + " expired refresh tokens");

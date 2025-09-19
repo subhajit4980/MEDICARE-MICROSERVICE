@@ -2,6 +2,7 @@ package com.medicare.Auth_Service.Services.TokenService;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.medicare.Auth_Service.DTO.Response.AuthResponse;
+import com.medicare.Auth_Service.DTO.Response.UserDTO;
 import com.medicare.Auth_Service.Exception.UserException;
 import com.medicare.Auth_Service.Model.Enum.TokenType;
 import com.medicare.Auth_Service.Model.RefreshToken;
@@ -18,7 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.Date;
 
@@ -101,7 +101,7 @@ public class TokenService {
     /**
      * Rotate tokens and issue a new access + refresh when access expires.
      */
-    public void refreshAccessToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void refreshAccessToken(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String refreshToken = getRefreshTokenFromCookie(request);
         if (refreshToken == null) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Missing refresh token");
@@ -151,10 +151,10 @@ public class TokenService {
 
         // Send refresh token as cookie
         storeRefreshCookie(newRefresh, response);
-
+        UserDTO dto = modelMapper.map(user, UserDTO.class);
         // Send access token in response body
         new ObjectMapper().writeValue(response.getOutputStream(),
-                AuthResponse.builder().accessToken(newAccess).build());
+                AuthResponse.builder().accessToken(newAccess).user(dto).build());
     }
 
     /**

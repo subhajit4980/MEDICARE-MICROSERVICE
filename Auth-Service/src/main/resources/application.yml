@@ -9,8 +9,8 @@ app:
   jwks:
     key-id: auth-key-2025              # Unique key ID (kid) for JWT signing; rotate keys by changing this
     rsa:
-      public-key-b64: ${PUBLIC_KEY:}
-      private-key-b64: ${PRIVATE_KEY:}
+      public-key-b64: ${PUBLIC_KEY}
+      private-key-b64: ${PRIVATE_KEY}
 
 spring:
   security:
@@ -27,3 +27,24 @@ spring:
         provider:
           google:
             issuer-uri: https://accounts.google.com  # Google's OpenID Connect issuer URI (used for JWT validation)
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      transaction-id-prefix: tx-   # optional (we use executeInTransaction in processor)
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        enable.idempotence: true   # ensure idempotent producer
+        acks: all
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        transaction:
+          id:
+            prefix: tx-
+  data:
+    redis:
+      host: localhost
+      port: 6379
