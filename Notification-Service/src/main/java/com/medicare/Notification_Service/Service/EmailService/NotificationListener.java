@@ -19,7 +19,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class NotificationListener {
 
-    private final JavaMailSender mailSender;
     private final ObjectMapper objectMapper;
     private final EmailService emailService;
     private final Configuration config;

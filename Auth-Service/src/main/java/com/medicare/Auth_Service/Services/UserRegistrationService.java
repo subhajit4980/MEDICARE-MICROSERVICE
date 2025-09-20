@@ -10,14 +10,15 @@ import com.medicare.Auth_Service.Model.User;
 import com.medicare.Auth_Service.Repositories.OutboxRepository;
 import com.medicare.Auth_Service.Repositories.UserRepository;
 import com.medicare.Auth_Service.Services.TokenService.JwtService;
-import com.medicare.Auth_Service.Services.TokenService.TokenService;
+import com.medicare.Auth_Service.Services.Schedule.TokenService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.MongoTransactionManager;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.data.redis.core.RedisTemplate;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +32,7 @@ public class UserRegistrationService {
     private final MongoTransactionManager txManager;
     private final RedisTemplate<String, Object> redisTemplate;
 
+    @Transactional
     public AuthResult finalizeRegistration(String email, HttpServletResponse response) {
         TransactionTemplate txTemplate = new TransactionTemplate(txManager);
 

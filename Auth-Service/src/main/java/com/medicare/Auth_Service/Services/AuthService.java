@@ -7,25 +7,19 @@ import com.medicare.Auth_Service.DTO.Request.SignUpRequest;
 import com.medicare.Auth_Service.DTO.Response.AuthResponse;
 import com.medicare.Auth_Service.DTO.Response.AuthResult;
 import com.medicare.Auth_Service.DTO.Response.UserDTO;
-import com.medicare.Auth_Service.Events.OutboxEvent;
-import com.medicare.Auth_Service.Events.UserRegisteredEvent;
 import com.medicare.Auth_Service.Events.UserVerificationRequested;
 import com.medicare.Auth_Service.Exception.UserException;
 import com.medicare.Auth_Service.Model.Enum.Role;
 import com.medicare.Auth_Service.Model.User;
-import com.medicare.Auth_Service.Repositories.AccessTokenRepository;
-import com.medicare.Auth_Service.Repositories.OutboxRepository;
-import com.medicare.Auth_Service.Repositories.RefreshTokenRepository;
 import com.medicare.Auth_Service.Repositories.UserRepository;
 import com.medicare.Auth_Service.Services.TokenService.JwtService;
-import com.medicare.Auth_Service.Services.TokenService.TokenService;
+import com.medicare.Auth_Service.Services.Schedule.TokenService;
 import com.medicare.Auth_Service.Utils.Common;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,9 +31,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
@@ -51,9 +43,6 @@ public class AuthService {
 
     // Dependencies injected via constructor
     private final UserRepository repository;
-    private final AccessTokenRepository accessTokenRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
-    private final OutboxRepository outboxRepository;
     private final PasswordEncoder encoder;
     private final JwtService jwtService;                 // Service for JWT issue/validation
     private final AuthenticationManager authenticationManager;
@@ -130,7 +119,7 @@ public class AuthService {
      * LOGIN METHOD
      * Authenticates existing user and issues fresh tokens.
      */
-    @Transactional(readOnly = true,transactionManager ="transactionManager")
+    @Transactional(readOnly = true, transactionManager = "transactionManager")
     public AuthResponse authenticate(SignInRequest request, HttpServletResponse response) {
         String norm = request.getEmail().trim().toLowerCase(Locale.ROOT);
 

@@ -2,6 +2,7 @@ package com.medicare.Auth_Service.Services;
 
 import com.medicare.Auth_Service.Model.User;
 import com.medicare.Auth_Service.Repositories.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,8 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Locale;
 
 @Component
+@RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
-    @Autowired
     private UserRepository userRepository;
 
     @Transactional(readOnly = true)

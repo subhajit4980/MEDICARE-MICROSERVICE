@@ -1,19 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <!-- Maven Project Model Version -->
     <modelVersion>4.0.0</modelVersion>
+
+    <!-- Spring Boot starter parent provides default configurations for plugins, dependencies, etc. -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.5.4</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/> <!-- Always resolve from repository -->
     </parent>
+
+    <!-- Project coordinates -->
     <groupId>com.medicare</groupId>
     <artifactId>Api-Gateway</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
+
+    <!-- Metadata -->
     <name>Api-Gateway</name>
     <description>API GATEWAY FOR MEDICARE</description>
+
+    <!-- Additional optional metadata -->
     <url/>
     <licenses>
         <license/>
@@ -27,27 +38,41 @@
         <tag/>
         <url/>
     </scm>
+
+    <!-- Properties (Java & Spring Cloud versions) -->
     <properties>
         <java.version>17</java.version>
         <spring-cloud.version>2025.0.0</spring-cloud.version>
     </properties>
+
+    <!-- Dependencies required for this project -->
     <dependencies>
+        <!-- Spring Cloud Gateway: Used for routing and API Gateway functionalities -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
+
+        <!-- Eureka Client: For service discovery & registration with Eureka Server -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
+
+        <!-- Spring Web MVC (Servlet-based). Usually not needed with WebFlux + Gateway -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
+            <version>6.2.10</version>
         </dependency>
+
+        <!-- WebFlux: Reactive programming support (used by Spring Cloud Gateway) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
+
+        <!-- JWT support (JJWT) for authentication & authorization -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
@@ -63,38 +88,54 @@
             <artifactId>jjwt-jackson</artifactId>
             <version>0.11.5</version>
         </dependency>
+
+        <!-- Testing dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- Lombok: To reduce boilerplate code (Getters, Setters, etc.) -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+
+        <!-- Embedded Tomcat core (used internally by Spring Boot) -->
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
         </dependency>
+
+        <!-- Logging API (Slf4j for abstraction) -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
+
+        <!-- Nimbus JWT library (another option for JWT handling) -->
         <dependency>
             <groupId>com.nimbusds</groupId>
             <artifactId>nimbus-jose-jwt</artifactId>
             <version>9.41</version>
         </dependency>
+
+        <!-- Resilience4j: For Circuit Breaker pattern (fault tolerance in microservices) -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
         </dependency>
+
+        <!-- OpenFeign: For making declarative REST client calls between services -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
     </dependencies>
+
+    <!-- Dependency Management: Controls versions of Spring Cloud dependencies -->
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -107,8 +148,10 @@
         </dependencies>
     </dependencyManagement>
 
+    <!-- Build section for plugins -->
     <build>
         <plugins>
+            <!-- Compiler Plugin: Ensures Lombok works at compile-time -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -121,11 +164,14 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+
+            <!-- Spring Boot Maven Plugin: To build executable JARs -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <excludes>
+                        <!-- Exclude Lombok from final JAR (only needed at compile time) -->
                         <exclude>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>

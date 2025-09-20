@@ -23,55 +23,69 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 @Configuration
-//@Profile("!test")
 @RequiredArgsConstructor
 public class KeyConfig {
 
+    // Custom properties holder (contains Base64/PEM encoded RSA keys)
     private final RsaKeyProperties rsaProps;
 
+    // Key ID used in JWK (helpful when rotating keys in future)
     @Value("${app.jwks.key-id:auth-key-2025}")
     private String keyId;
 
+    // ---------------- RSA Key Beans ----------------
+
     @Bean
     public RSAPublicKey rsaPublicKey() throws Exception {
+        // Load and convert configured public key into RSAPublicKey
         return loadPublicKey(rsaProps.publicKeyB64());
     }
 
     @Bean
     public RSAPrivateKey rsaPrivateKey() throws Exception {
+        // Load and convert configured private key into RSAPrivateKey
         return loadPrivateKey(rsaProps.privateKeyB64());
     }
 
     @Bean
     public RSAKey rsaJwk(RSAPublicKey publicKey, RSAPrivateKey privateKey) {
+        // Create a JWK (JSON Web Key) representation of the RSA keypair
         return new RSAKey.Builder(publicKey)
                 .privateKey(privateKey)
-                .keyID(keyId)
+                .keyID(keyId) // key identifier for JWKS endpoint
                 .build();
     }
 
     @Bean
     public JWKSet jwkSet(RSAKey rsaJwk) {
+        // JWKS (JSON Web Key Set) exposed via an endpoint (/oauth2/jwks)
         return new JWKSet(rsaJwk.toPublicJWK());
     }
 
     @Bean
     public JWKSource<SecurityContext> jwkSource(RSAKey rsaJwk) {
+        // Provides JWK source for JWT signing/verification
         return new ImmutableJWKSet<>(new JWKSet(rsaJwk));
     }
 
+    // ---------------- JWT Encoder/Decoder ----------------
+
     @Bean
     public JwtEncoder jwtEncoder(JWKSource<SecurityContext> jwkSource) {
+        // Encoder used to generate JWT tokens (sign with private key)
         return new NimbusJwtEncoder(jwkSource);
     }
 
     @Bean
     public JwtDecoder jwtDecoder(RSAPublicKey publicKey) {
+        // Decoder used to verify and parse JWT tokens (verify with public key)
         return NimbusJwtDecoder.withPublicKey(publicKey).build();
     }
 
-    // ---------- helper methods ----------
+    // ---------------- Helper Methods ----------------
+
     private RSAPublicKey loadPublicKey(String maybePemOrB64) throws Exception {
+        // Convert string (PEM or Base64) into RSAPublicKey
         byte[] der = extractDerBytes(maybePemOrB64);
         X509EncodedKeySpec spec = new X509EncodedKeySpec(der);
         KeyFactory kf = KeyFactory.getInstance("RSA");
@@ -79,6 +93,7 @@ public class KeyConfig {
     }
 
     private RSAPrivateKey loadPrivateKey(String maybePemOrB64) throws Exception {
+        // Convert string (PEM or Base64) into RSAPrivateKey
         byte[] der = extractDerBytes(maybePemOrB64);
         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(der);
         KeyFactory kf = KeyFactory.getInstance("RSA");
@@ -86,10 +101,10 @@ public class KeyConfig {
     }
 
     /**
-     * Accepts:
-     * - raw PEM text (contains -----BEGIN ...-----)
-     * - base64 of DER bytes (single-line)
-     * - base64 of entire PEM file (decodes to PEM text)
+     * Handles different formats of RSA keys:
+     * - PEM text (with -----BEGIN/END----- headers)
+     * - Base64 of DER bytes
+     * - Base64 of entire PEM file (double encoded)
      */
     private byte[] extractDerBytes(String input) {
         if (input == null || input.isBlank()) {
@@ -97,26 +112,27 @@ public class KeyConfig {
         }
         String trimmed = input.trim();
 
-        // A) If it contains PEM headers -> strip and decode body
+        // Case A: PEM format → strip headers and decode Base64 body
         if (trimmed.contains("-----BEGIN")) {
             String body = stripPemHeaders(trimmed);
             return Base64.getDecoder().decode(body);
         }
 
-        // B) Else attempt to decode base64
+        // Case B: Plain Base64 → decode directly
         byte[] decoded = Base64.getDecoder().decode(trimmed);
 
-        // If decoded bytes look like PEM text (someone base64'd the entire PEM), handle that
+        // Extra: Handle case where decoded result is still PEM text
         String asString = new String(decoded, StandardCharsets.UTF_8);
         if (asString.contains("-----BEGIN")) {
             String body = stripPemHeaders(asString);
             return Base64.getDecoder().decode(body);
         }
 
-        // Otherwise, decoded bytes are DER bytes already
+        // Otherwise → already raw DER
         return decoded;
     }
 
+    // Removes PEM headers/footers and whitespace
     private String stripPemHeaders(String pem) {
         return pem
                 .replaceAll("-----BEGIN [A-Z ]+-----", "")

@@ -23,7 +23,6 @@ public class LoggingGlobalPreFilter implements GlobalFilter, Ordered {
         logger.info(">>> Incoming Request: method={}, path={}, headers={}",
                 request.getMethod(), request.getURI().getPath(), request.getHeaders());
         return jwtAuthGatewayFilterFactory.apply(new JwtAuthGatewayFilterFactory.Config()).filter(exchange, chain);
-
 //        return chain.filter(exchange);
     }
 

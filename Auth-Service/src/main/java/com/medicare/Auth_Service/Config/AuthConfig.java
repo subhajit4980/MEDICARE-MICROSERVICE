@@ -44,8 +44,7 @@ public class AuthConfig {
                                 .anyRequest().permitAll()
                 )
                 .oauth2Login(o -> o
-//                        .userInfoEndpoint(u -> u.userService(oAuth2UserService))
-                                .successHandler(oauth2SuccessHandler)
+                        .successHandler(oauth2SuccessHandler)
                 );
         // Adding custom authentication provider
         http.authenticationProvider(authenticationProvider());

@@ -1,4 +1,4 @@
-package com.medicare.Auth_Service.Services;
+package com.medicare.Auth_Service.Services.Schedule;
 
 import com.medicare.Auth_Service.Repositories.OutboxRepository;
 import jakarta.annotation.PostConstruct;
@@ -13,6 +13,7 @@ import java.time.temporal.ChronoUnit;
 @Service
 public class OutboxEventCleanupService {
     private final OutboxRepository outboxRepository;
+
     /**
      * Executes once right after the application starts.
      * Ensures no expired outbox events remain in DB from before 7 days.
@@ -26,6 +27,7 @@ public class OutboxEventCleanupService {
             System.out.println("Init cleanup error: " + e.getMessage());
         }
     }
+
     @Scheduled(cron = "0 0 2 * * ?") // every day at 2 AM
     public void cleanupPublishedEvents() {
         outboxRepository.deleteByPublishedTrueAndCreatedAtBefore(
