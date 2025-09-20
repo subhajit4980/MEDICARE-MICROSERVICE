@@ -21,8 +21,11 @@ caching.
 - **Inventory Service** – Tracks stock availability.
 - **Notification Service** – Sends SMS, emails, and push notifications.
 - **Payment Service** – Processes payments.
-- **Redis** – Caches tokens, manages revocations.
+- **Redis** – Caches tokens, manages revocations, temporary OTP storage.
+- **Kafka** – Provides reliable async messaging between services.
+- **MongoDB** – Persistent storage for users, products, orders, etc.
 - **AWS Services** – Hosts secrets, deploys infrastructure, supports scaling.
+
 
 ---
 
@@ -242,6 +245,48 @@ flowchart TD
     J --> C[Client gets Access/Refresh JWT]
     C --> GW[API Gateway validates & routes]
 ```
+---
+# 🔎 User Registration, Verification & Notification Flow (Kafka + Redis)
+
+```mermaid
+sequenceDiagram
+    participant User as User
+    participant Auth as Auth Service
+    participant Redis as Redis (Temp Cache)
+    participant Kafka as Kafka Broker
+    participant Notify as Notification Service
+    participant Mongo as MongoDB (Permanent Storage)
+
+    User->>Auth: Register (Name, Email, Password)
+    Auth->>Redis: Store Temp User + OTP (TTL = 5 mins)
+    Auth->>Kafka: Publish "UserVerificationRequested" Event
+    Kafka-->>Notify: Deliver Verification Event
+    Notify->>User: Send Verification Email with OTP
+
+    User->>Auth: Submit OTP
+    Auth->>Redis: Validate OTP
+    Auth->>Mongo: Save User Permanently
+    Auth->>Kafka: Publish "UserRegistered" Event
+    Kafka-->>Notify: Deliver Welcome Event
+    Notify->>User: Send Welcome Email
+```
+---
+
+### 🔄 Flow Explanation
+1. **Registration**
+    - User registers → Auth service caches user in **Redis** with OTP (short TTL).
+    - Auth service publishes `UserVerificationRequested` event to **Kafka**.
+
+2. **Verification Mail**
+    - Notification service consumes Kafka event → sends **verification email** with OTP.
+
+3. **OTP Verification**
+    - User submits OTP → Auth service validates against Redis.
+    - If valid → User saved to **MongoDB** permanently.
+    - Auth service publishes `UserRegistered` event to **Kafka**.
+
+4. **Welcome Mail**
+    - Notification service consumes → sends **welcome email**.
 
 ---
 
@@ -357,5 +402,6 @@ flowchart TD
 * Store **RSA keys** in **AWS Secrets Manager** in production.
 * Use **HTTPS** in production (`issuer` must be HTTPS).
 * Enable **Redis clustering** for scalability.
+* Enable Kafka replication for durability.
 * Enable **auto-scaling** for core services (Product, Order, Inventory).
 

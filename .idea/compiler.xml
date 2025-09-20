@@ -3,16 +3,13 @@
   <component name="CompilerConfiguration">
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
-      <profile name="Annotation profile for Service-Registry" enabled="true">
+      <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
-        </processorPath>
         <module name="Service-Registry" />
       </profile>
-      <profile name="Annotation profile for Notification-Service" enabled="true">
+      <profile name="Annotation profile for User-Service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -21,8 +18,8 @@
         </processorPath>
         <module name="Inventory-Service" />
         <module name="Order-Service" />
-        <module name="Auth-Service" />
         <module name="Payment-Service" />
+        <module name="Auth-Service" />
         <module name="Notification-Service" />
         <module name="Api-Gateway" />
         <module name="Product-Service" />
