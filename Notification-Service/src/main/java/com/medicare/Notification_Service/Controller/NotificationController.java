@@ -1,7 +1,8 @@
 package com.medicare.Notification_Service.Controller;
 
 import com.medicare.Notification_Service.Service.EmailService.EmailService;
-import com.medicare.Notification_Service.Service.SmsService.SmsService;
+import com.medicare.Notification_Service.Service.SmsService.SmsSender;
+import com.medicare.Notification_Service.Service.SmsService.SmsService_prod;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import jakarta.mail.MessagingException;
@@ -21,7 +22,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class NotificationController {
 
-    private final SmsService notificationService;
+    private final SmsSender notificationService;
     private final EmailService emailService;
     private final Configuration config;
 

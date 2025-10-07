@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,11 +62,13 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @Profile("prod")
     @GetMapping("/google-login")
     public void googleLogin(HttpServletResponse response) throws IOException {
         // Redirect user to Spring Security's default OAuth2 login endpoint
-        response.sendRedirect("/oauth2/authorization/google");
+        response.sendRedirect("http://localhost:8085/oauth2/authorization/google");
     }
+
 
     @GetMapping("/test")
     public ResponseEntity<?> test() {

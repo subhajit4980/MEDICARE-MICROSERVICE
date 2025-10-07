@@ -20,6 +20,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,6 +54,7 @@ public class AuthService {
     private final KafkaTemplate kafkaTemplate;
     private final ObjectMapper objectMapper;
     private final UserRegistrationService userRegistrationService;
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
     /**
      * SIGNUP METHOD
@@ -60,6 +63,7 @@ public class AuthService {
      */
     @Transactional
     public String signUpUser(SignUpRequest request) throws JsonProcessingException {
+        log.info("-----> signup method called");
         // Normalize email (trim & lowercase)
         String norm = request.getEmail().trim().toLowerCase(Locale.ROOT);
 
@@ -75,6 +79,7 @@ public class AuthService {
             throw new UserException(HttpStatus.NOT_ACCEPTABLE, "Password must not contain spaces");
         if (!charlist.isEmpty())
             throw new UserException(HttpStatus.NOT_ACCEPTABLE, "Password invalid: " + charlist);
+        log.info("-----> User creating");
 
         // Create user object
         User user = User.builder()
@@ -86,6 +91,7 @@ public class AuthService {
                 .verified(false)
                 .role(request.getRole() != null ? request.getRole() : Role.USER)
                 .build();
+        log.info("-----> User created");
 //        Store the user data in redis temporarily
         redisTemplate.opsForValue().set(norm, user, 60, TimeUnit.MINUTES);
         String otp = Common.generateOTP();
@@ -95,7 +101,15 @@ public class AuthService {
                 request.getFirstName() + " " + request.getLastName(),
                 norm
         );
+        log.info("-----> saved data in redis");
+        try{
         kafkaTemplate.send("user-verification-topic", objectMapper.writeValueAsString(event));
+        }catch (Exception exeption)
+        {
+            log.error("-----> {}", exeption.toString());
+        }
+        log.info("-----> Kafka topic send");
+
         // Return response
         return "Verification mail send";
     }

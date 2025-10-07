@@ -28,7 +28,6 @@ public class TokenService {
 
     // === Dependencies injected by Spring ===
     private final UserRepository repository;
-    private final AccessTokenRepository accessTokenRepository;     // Repo for access tokens (currently not used)
     private final RefreshTokenRepository refreshTokenRepository;   // Repo for refresh tokens
     private final JwtService jwtService;                           // Service to issue & validate JWTs (RS256)
     ModelMapper modelMapper = new ModelMapper();                   // Mapper for DTOs (not used much here)
@@ -40,20 +39,6 @@ public class TokenService {
         Date now = new Date();
         Date refreshExp = Date.from(new Date().toInstant().plus(Duration.ofDays(7)));
 
-        // Access token storage is commented out (you’re relying only on JWT itself + DB refresh token).
-        // If needed, uncomment this block to store access tokens too.
-        /*
-        var at = AccessToken.builder()
-                .user(user)
-                .token(accessToken)
-                .tokenType(TokenType.BEARER)
-                .expired(false)
-                .revoked(false)
-                .createdAt(now)
-                .expiresAt(accessExp)
-                .build();
-        accessTokenRepository.save(at);
-        */
 
         // Save refresh token in DB
         var rt = RefreshToken.builder()

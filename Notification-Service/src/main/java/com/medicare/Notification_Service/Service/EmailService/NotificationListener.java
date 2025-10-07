@@ -30,6 +30,7 @@ public class NotificationListener {
             Map<String, Object> model = new HashMap<>();
             model.put("Name", event.getFullName());
             model.put("medicareWebsiteUrl", "https://subhajit4980.github.io/Subhajit/");
+            config.setClassForTemplateLoading(this.getClass(), "/templates");
             Template t = config.getTemplate("email-template.ftl");
             final String WelcomeSubject = "Welcome to Medicare - Your Journey to Health Begins Here!";
             emailService.sendEmail(event.getEmail(), WelcomeSubject, t, model);
@@ -46,6 +47,7 @@ public class NotificationListener {
         Map<String, Object> model = new HashMap<>();
         model.put("Name", event.getFullName());
         model.put("otp", event.getOtp());
+        config.setClassForTemplateLoading(this.getClass(), "/templates");
         Template t = config.getTemplate("Verify-Account-Otp.ftl");
         final String subject = "Your OTP Code for Account Verification";
         emailService.sendEmail(event.getEmail(), subject, t, model);

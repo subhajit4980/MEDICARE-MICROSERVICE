@@ -1,45 +1,327 @@
-version: '3.8'
+version: "3.9"
+
+volumes:
+  m2-repo:
+  mongo-data:
+  redis-data:
+  kafka-data:
+  zookeeper-data:
+  zookeeper-log:
 
 services:
-  # ------------------------
-  # Zookeeper (needed by Kafka)
-  # ------------------------
+  # -------------------------------
+  # Zookeeper
+  # -------------------------------
   zookeeper:
-    image: confluentinc/cp-zookeeper:7.4.0
+    image: confluentinc/cp-zookeeper:7.6.0
     container_name: zookeeper
     ports:
       - "2181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper/data
+      - zookeeper-log:/var/lib/zookeeper/log
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
-  # ------------------------
-  # Kafka Broker
-  # ------------------------
+  # -------------------------------
+  # Kafka
+  # -------------------------------
   kafka:
-    image: confluentinc/cp-kafka:7.4.0
+    image: confluentinc/cp-kafka:7.6.0
     container_name: kafka
     ports:
       - "9092:9092"
-      - "9093:9093"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://host.docker.internal:9093
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
     depends_on:
-      - zookeeper
+      zookeeper:
+        condition: service_healthy
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "9092"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
-
-  # ------------------------
+  # -------------------------------
   # Redis
-  # ------------------------
+  # -------------------------------
   redis:
-    image: redis:7.2
+    image: redis:7.4
     container_name: redis
     ports:
       - "6379:6379"
-    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # -------------------------------
+  # MongoDB
+  # -------------------------------
+#  mongo:
+#    image: mongo:6.0
+#    container_name: mongo
+#    ports:
+#      - "27017:27017"
+#    environment:
+#      MONGO_INITDB_DATABASE: ${MONGO_DB}
+#      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USERNAME}
+#      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
+#    volumes:
+#      - mongo-data:/data/db
+#    healthcheck:
+#      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 10
+
+  # -------------------------------
+  # Service Registry
+  # -------------------------------
+  service-registry:
+    build:
+      context: ./Service-Registry
+      dockerfile: Dockerfile
+    container_name: service-registry
+    ports:
+      - "8761:8761"
+#    environment:
+#      SPRING_PROFILES_ACTIVE: docker
+    env_file:
+      - .env
+    depends_on:
+      kafka:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - m2-repo:/root/.m2
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8761/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  # -------------------------------
+  # API Gateway
+  # -------------------------------
+  api-gateway:
+    build:
+      context: ./Api-Gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8765:8765"
+#    environment:
+#      SPRING_PROFILES_ACTIVE: docker
+    env_file:
+      - .env
+    depends_on:
+      service-registry:
+        condition: service_healthy
+    volumes:
+      - m2-repo:/root/.m2
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:8765/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 60s
+
+
+  # -------------------------------
+  # Auth Service
+  # -------------------------------
+  auth-service:
+    build:
+      context: ./Auth-Service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    ports:
+      - "8085:8085"
+    environment:
+#      SPRING_PROFILES_ACTIVE: docker
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_MONGO_URI: mongodb://mongo:27017/auth
+    env_file:
+      - .env
+    depends_on:
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      api-gateway:
+        condition: service_healthy
+    volumes:
+      - m2-repo:/root/.m2
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8085/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  # -------------------------------
+  # Notification Service
+  # -------------------------------
+  notification-service:
+    build:
+      context: ./Notification-Service
+      dockerfile: Dockerfile
+    container_name: notification-service
+    ports:
+      - "8090:8090"
+    environment:
+#      SPRING_PROFILES_ACTIVE: docker
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_MONGO_URI: mongodb://mongo:27017/notification
+    env_file:
+      - .env
+    depends_on:
+      auth-service:
+        condition: service_healthy
+    volumes:
+      - m2-repo:/root/.m2
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8090/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  # -------------------------------
+  # Other Services (User, Product, Order, Inventory, Payment)
+  # -------------------------------
+  user-service:
+    build:
+      context: ./User-Service
+      dockerfile: Dockerfile
+    container_name: user-service
+    ports:
+      - "8078:8078"
+    environment:
+#      SPRING_PROFILES_ACTIVE: docker
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_MONGO_URI: mongodb://mongo:27017/user
+    depends_on:
+      notification-service:
+        condition: service_healthy
+    volumes:
+      - m2-repo:/root/.m2
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8078/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  product-service:
+    build:
+      context: ./Product-Service
+      dockerfile: Dockerfile
+    container_name: product-service
+    ports:
+      - "8075:8075"
+    environment:
+#      SPRING_PROFILES_ACTIVE: docker
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_MONGO_URI: mongodb://mongo:27017/product
+    depends_on:
+      notification-service:
+        condition: service_healthy
+    volumes:
+      - m2-repo:/root/.m2
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8075/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  order-service:
+    build:
+      context: ./Order-Service
+      dockerfile: Dockerfile
+    container_name: order-service
+    ports:
+      - "8087:8087"
+    environment:
+#      SPRING_PROFILES_ACTIVE: docker
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_MONGO_URI: mongodb://mongo:27017/order
+    depends_on:
+      notification-service:
+        condition: service_healthy
+    volumes:
+      - m2-repo:/root/.m2
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8087/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  inventory-service:
+    build:
+      context: ./Inventory-Service
+      dockerfile: Dockerfile
+    container_name: inventory-service
+    ports:
+      - "8095:8095"
+    environment:
+#      SPRING_PROFILES_ACTIVE: docker
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_MONGO_URI: mongodb://mongo:27017/inventory
+    depends_on:
+      notification-service:
+        condition: service_healthy
+    volumes:
+      - m2-repo:/root/.m2
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8095/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  payment-service:
+    build:
+      context: ./Payment-Service
+      dockerfile: Dockerfile
+    container_name: payment-service
+    ports:
+      - "8070:8070"
+    environment:
+#      SPRING_PROFILES_ACTIVE: docker
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_MONGO_URI: mongodb://mongo:27017/payment
+    depends_on:
+      notification-service:
+        condition: service_healthy
+    volumes:
+      - m2-repo:/root/.m2
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8070/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s

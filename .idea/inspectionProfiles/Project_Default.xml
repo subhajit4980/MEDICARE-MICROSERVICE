@@ -8,16 +8,25 @@
         <list>
           <option value="Api-Gateway" />
           <option value="Api-Gateway" />
+          <option value="Payment-Service" />
+          <option value="Product-Service" />
+          <option value="User-Service" />
         </list>
       </option>
       <option name="ignoredPackages">
         <list>
           <option value="com.thoughtworks.xstream:xstream:1.4.20" />
           <option value="org.springframework.cloud:spring-cloud-gateway-server:4.3.0" />
+          <option value="org.springframework:spring-beans:6.2.9" />
+          <option value="org.springframework:spring-beans:6.2.9" />
+          <option value="org.springframework:spring-beans:6.2.9" />
         </list>
       </option>
       <option name="ignoredReasons">
         <list>
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
           <option value="Not exploitable" />
           <option value="Not exploitable" />
         </list>

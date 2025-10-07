@@ -20,6 +20,7 @@ import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -33,41 +34,63 @@ public class JwtAuthGatewayFilterFactory extends AbstractGatewayFilterFactory<Jw
 
     private static final Logger log = LoggerFactory.getLogger(JwtAuthGatewayFilterFactory.class);
 
-    private final RemoteJWKSet<SecurityContext> jwkSet;
     private final RouteValidator validator;
+    private final LoadBalancerClient loadBalancerClient;
+    private volatile RemoteJWKSet<SecurityContext> jwkSet;
 
     @Autowired
-    public JwtAuthGatewayFilterFactory(RouteValidator validator, LoadBalancerClient loadBalancerClient) throws Exception {
+    public JwtAuthGatewayFilterFactory(RouteValidator validator, LoadBalancerClient loadBalancerClient) {
         super(Config.class);
         this.validator = validator;
-        // Dynamically resolve Auth-Service instance
-        ServiceInstance instance = loadBalancerClient.choose("auth-service");
-        if (instance == null) {
-            throw new IllegalStateException("No instance of auth-service found in Eureka");
+        this.loadBalancerClient = loadBalancerClient;
+        log.info(">>> JwtAuthFilter initialized. Waiting for Auth-Service JWKS...");
+    }
+
+    /**
+     * Periodically try to resolve auth-service and load JWKS
+     */
+    @Scheduled(fixedDelay = 10000) // every 10s
+    public void refreshAuthServiceJwk() {
+        if (jwkSet != null) return; // already initialized
+
+        try {
+            ServiceInstance instance = loadBalancerClient.choose("auth-service");
+            if (instance != null) {
+                String jwksUrl = String.format("http://%s:%d/auth/.well-known/jwks.json",
+                        instance.getHost(), instance.getPort());
+
+                this.jwkSet = new RemoteJWKSet<>(
+                        new URL(jwksUrl),
+                        new com.nimbusds.jose.util.DefaultResourceRetriever(5000, 5000, 3600 * 1000)
+                );
+                log.info("✅ Connected to Auth-Service, JWKS endpoint = {}", jwksUrl);
+            } else {
+                log.warn("Auth-Service not available yet, will retry...");
+            }
+        } catch (Exception e) {
+            log.error("Failed to initialize JWKS from Auth-Service: {}", e.getMessage());
         }
-
-        String jwksUrl = String.format("http://%s:%d/auth/.well-known/jwks.json",
-                instance.getHost(), instance.getPort());
-
-        log.info("Resolved Auth-Service JWKS endpoint = {}", jwksUrl);
-        log.info(">>> JwtAuthFilter initialized and registered");
-        // Auth-Service JWKS endpoint (through Gateway)
-        this.jwkSet = new RemoteJWKSet<>(
-                new URL(jwksUrl),
-                new com.nimbusds.jose.util.DefaultResourceRetriever(5000, 5000, 3600 * 1000)
-        );
     }
 
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
             String path = exchange.getRequest().getURI().getPath();
+
             // Skip auth if endpoint is open
             if (!validator.isSecured.test(exchange.getRequest())) {
                 log.info("[OPEN] {} → skipping JwtAuthFilter", path);
                 return chain.filter(exchange);
             }
+
             log.info("[SECURED] {} → validating JWT", path);
+
+            // If jwkSet not ready, block request with 503
+            if (jwkSet == null) {
+                log.error("[ERROR] {} → Auth-Service not available, cannot validate JWT", path);
+                return Mono.error(new UserException(HttpStatus.SERVICE_UNAVAILABLE,
+                        "Auth-Service not available. Please try again later."));
+            }
 
             String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -89,15 +112,13 @@ public class JwtAuthGatewayFilterFactory extends AbstractGatewayFilterFactory<Jw
                     return Mono.error(new UserException(HttpStatus.UNAUTHORIZED,
                             "No matching JWK for kid=" + signedJWT.getHeader().getKeyID()));
                 }
+
                 log.info("Token kid = {}", signedJWT.getHeader().getKeyID());
                 // Verify signature
                 RSAKey rsaKey = (RSAKey) jwks.get(0);
                 log.info("Using kid={} alg={} to verify token", rsaKey.getKeyID(), rsaKey.getAlgorithm());
                 JWSVerifier verifier = new RSASSAVerifier(rsaKey.toRSAPublicKey());
                 if (!signedJWT.verify(verifier)) {
-                    log.info("Token Header: {}", signedJWT.getHeader().toJSONObject());
-                    log.info("Token Payload: {}", signedJWT.getPayload().toString());
-                    log.info("Available JWKS: {}", jwks);
                     log.error("[ERROR] {} → Invalid JWT signature", path);
                     return Mono.error(new UserException(HttpStatus.UNAUTHORIZED, "Invalid JWT signature"));
                 }

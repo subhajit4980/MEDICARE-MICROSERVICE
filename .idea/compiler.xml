@@ -7,7 +7,6 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="Service-Registry" />
       </profile>
       <profile name="Annotation profile for Api-Gateway" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -16,14 +15,33 @@
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
         </processorPath>
+        <module name="Api-Gateway" />
+      </profile>
+      <profile name="Annotation profile for Auth-Service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar" />
+        </processorPath>
+        <module name="Auth-Service" />
+      </profile>
+      <profile name="Annotation profile for Product-Service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar" />
+        </processorPath>
         <module name="Inventory-Service" />
         <module name="Order-Service" />
         <module name="Payment-Service" />
-        <module name="Auth-Service" />
         <module name="Notification-Service" />
-        <module name="Api-Gateway" />
         <module name="Product-Service" />
         <module name="User-Service" />
+        <module name="Service-Registry" />
       </profile>
     </annotationProcessing>
   </component>

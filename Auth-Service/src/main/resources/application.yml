@@ -1,5 +1,5 @@
 server:
-  port: 9000                           # The port your Auth server will run on (http://localhost:9000)
+  port: 8085                           # The port your Auth server will run on (http://localhost:9000)
 
 app:
   issuer: http://localhost:9000        # The "issuer" value in your JWT tokens (must be HTTPS in production)
@@ -20,10 +20,10 @@ spring:
           google:
             client-id: ${GOOGLE_CLIENT_ID}            # Google OAuth2 Client ID (set in environment variables)
             client-secret: ${GOOGLE_CLIENT_SECRET}    # Google OAuth2 Client Secret (also in environment variables)
-            redirect-uri: http://localhost:9000/login/oauth2/code/google
+            redirect-uri: http://localhost:8085/login/oauth2/code/google
             # Where Google will redirect after login (must match in Google console)
-
             scope: openid, profile, email            # Scopes requested from Google (basic profile info + email)
+
         provider:
           google:
             issuer-uri: https://accounts.google.com  # Google's OpenID Connect issuer URI (used for JWT validation)
@@ -46,5 +46,16 @@ spring:
             prefix: tx-
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${REDIS_HOST:localhost}
+      port: ${ REDIS_PORT:6379 }
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://service-registry:8761/eureka/
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
