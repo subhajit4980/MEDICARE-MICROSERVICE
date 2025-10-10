@@ -1,0 +1,206 @@
+# Medicare
+
+###
+# group: Authentication
+# @name signup
+POST http://localhost:8080/api/auth/signup
+Content-Type: application/json
+
+{
+  "firstName": "Subhajit",
+  "lastName": "Patra",
+  "username": "subhajit@49870",
+  "email": "subhajitpatra498@gmail.com",
+  "password": "123456",
+  "roles": [
+    "user",
+    "admin"
+  ]
+}
+
+###
+# group: Authentication
+# @name Forget_password
+POST http://localhost:8080/api/auth/forget_password
+Content-Type: application/json
+
+{
+  "email": "subhajitpatra498@gmail.com"
+}
+
+###
+# group: Authentication
+# @name OTP verification
+POST http://localhost:8080/api/auth/verify_OTP
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="otp"
+
+342818
+--WebAppBoundary
+Content-Disposition: form-data; name="userEmail"
+
+subhajitpatra498@gmail.com
+--WebAppBoundary
+
+###
+# group: Authentication
+# @name update_Password
+POST http://localhost:8080/api/auth/update_Password
+Content-Type: application/json
+
+{
+  "email": "subhajitpatra498@gmail.com",
+  "password": "subhajit123"
+}
+
+###
+# group: Authentication
+# @name TEST
+GET https://localhost:8765/auth-service/test
+Content-Type: application/json
+
+###
+# group: Product
+# @name AddMedicine
+POST http://localhost:8080/api/item/create
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdWJoYWppdEA0OTg3MCIsImVtYWlsIjoic3ViaGFqaXRwYXRyYTQ5OEBnbWFpbC5jb20iLCJpYXQiOjE2OTkzNTA1NzQsImV4cCI6MTY5OTQzNjk3NH0.sqftVix0m_xKe95MJKI_4LEcmIGGGaKMAyaAzd4P5c0
+Content-Type: application/json
+
+{
+  "name": "Zyrtec Allergy",
+  "description": [
+    "Zyrtec Tablet belongs to a group of medicines called antihistamines. It is used to treat various allergic conditions such as hay fever, conjunctivitis and some skin reactions, and reactions to bites and stings. It relieves watery eyes, runny nose, sneezing, and itching.",
+    "Zyrtec Tablet can be taken with or without food. The dose required for you may vary depending on what you are taking it for. This medicine is usually taken in the evening but follow the advice of your doctor on how to take it. You may need this medicine only on days you have symptoms, but if you are taking it to prevent symptoms you should take it regularly. If you miss doses or stop taking it earlier than advised, your symptoms may come back.",
+    "This medicine is generally very safe. The most common side effects include feeling sleepy or dizzy. These are usually mild and go away after a couple of days as your body adjusts. Consult your doctor if any of the side effects persist or worry you. You should avoid alcohol while taking this medicine.Before taking it, tell your doctor if you have any kidney problems or epilepsy. Your dose may need to be modified or this medicine may not be suitable. Some other medicines can interact with this medicine so let your healthcare team know what else you are taking. You should also talk to your doctor before using this medicine if you are pregnant or breastfeeding, although it is not thought to be harmful."
+  ],
+  "price": 21.00,
+  "discountPercentage": 13.0,
+  "quantityInStock": 30,
+  "brand": "USV Ltd",
+  "manufactureDate": "2022-03-05",
+  "expiryDate": "2024-11-15",
+  "usageInstructions": "Take this medicine in the dose and duration as advised by your doctor. Swallow it as a whole. Do not chew, crush or break it. Zyrtec Tablet may be taken with or without food, but it is better to take it at a fixed time.",
+  "imageUrl": "https://onemg.gumlet.io/l_watermark_346,w_480,h_480/a_ignore,w_480,h_480,c_fit,q_auto,f_auto/8689121d33a04bacb1ef04a0809b1086.jpg",
+  "pack_Size": "10 tablets in 1 strip",
+  "activeIngredients": "Cetirizine",
+  "sideEffects": [
+    "Sleepiness",
+    "Sleepiness",
+    "Vomiting",
+    "Dryness in mouth",
+    "Headache",
+    "Constipation"
+  ]
+}
+
+
+###
+# group: Product
+# @name getMedicine
+GET http://localhost:8080/api/item/getitem
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdWJoYWppdEA0OTg3MCIsImVtYWlsIjoic3ViaGFqaXRwYXRyYTQ5OEBnbWFpbC5jb20iLCJpYXQiOjE2OTkzNTA1NzQsImV4cCI6MTY5OTQzNjk3NH0.sqftVix0m_xKe95MJKI_4LEcmIGGGaKMAyaAzd4P5c0
+
+###
+# group: Product
+# @name update_medicine
+POST http://localhost:8080/api/medicine/update
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdWJoYWppdEA0OTg3MCIsImVtYWlsIjoic3ViaGFqaXRwYXRyYTQ5OEBnbWFpbC5jb20iLCJpYXQiOjE2OTkyNjUzNTUsImV4cCI6MTY5OTM1MTc1NX0.BWrtPNwqE6vVQkhhJTx4u5WZ_lb6FvpkwDESsX-WIzE
+Content-Type: application/json
+
+{
+  "name": "Vitamin D3 Supplement",
+  "price": 11.00,
+  "quantityInStock": 10,
+   "expiryDate": "2025-12-31"
+}
+
+
+###
+# group: Product
+# @name delete
+POST http://localhost:8080/api/medicine/delete
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdWJoYWppdEA0OTg3MCIsImVtYWlsIjoic3ViaGFqaXRwYXRyYTQ5OEBnbWFpbC5jb20iLCJpYXQiOjE2OTkwOTA5MjksImV4cCI6MTY5OTE3NzMyOX0.ImJPEnPd1rGNO0wI_56P1KkMGrSuVQy-C5_6du6_OcA
+Content-Type: application/json
+
+{
+  "medicineId": "651dd6d1f011985a17427719"
+}
+
+###
+# group: Product
+# @name filterByPopularity
+GET http://localhost:8080/api/item/filterByPopularity
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdWJoYWppdEA0OTg3MCIsImVtYWlsIjoic3ViaGFqaXRwYXRyYTQ5OEBnbWFpbC5jb20iLCJpYXQiOjE2OTkzNTA1NzQsImV4cCI6MTY5OTQzNjk3NH0.sqftVix0m_xKe95MJKI_4LEcmIGGGaKMAyaAzd4P5c0
+
+###
+# group: Product
+# @name productByLeastDiscount
+GET http://localhost:8080/api/item/productByLeastDiscount?
+    discount=10
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdWJoYWppdEA0OTg3MCIsImVtYWlsIjoic3ViaGFqaXRwYXRyYTQ5OEBnbWFpbC5jb20iLCJpYXQiOjE2OTkzNTA1NzQsImV4cCI6MTY5OTQzNjk3NH0.sqftVix0m_xKe95MJKI_4LEcmIGGGaKMAyaAzd4P5c0
+
+###
+# group: Product
+# @name filterByDiscount
+GET http://localhost:8080/api/item/filterByDiscount?
+    discount=13
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdWJoYWppdEA0OTg3MCIsImVtYWlsIjoic3ViaGFqaXRwYXRyYTQ5OEBnbWFpbC5jb20iLCJpYXQiOjE2OTkzNTA1NzQsImV4cCI6MTY5OTQzNjk3NH0.sqftVix0m_xKe95MJKI_4LEcmIGGGaKMAyaAzd4P5c0
+
+###
+# group: Product
+# @name filterByCategory
+GET http://localhost:8080/api/item/filterByCategory?
+    category=medicine
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdWJoYWppdEA0OTg3MCIsImVtYWlsIjoic3ViaGFqaXRwYXRyYTQ5OEBnbWFpbC5jb20iLCJpYXQiOjE2OTkzNTA1NzQsImV4cCI6MTY5OTQzNjk3NH0.sqftVix0m_xKe95MJKI_4LEcmIGGGaKMAyaAzd4P5c0
+
+###
+# group: Cart
+# @name addCart
+POST http://localhost:8080/api/order/addCart
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdWJoYWppdEA0OTg3MCIsImVtYWlsIjoic3ViaGFqaXRwYXRyYTQ5OEBnbWFpbC5jb20iLCJpYXQiOjE2OTkzNTA1NzQsImV4cCI6MTY5OTQzNjk3NH0.sqftVix0m_xKe95MJKI_4LEcmIGGGaKMAyaAzd4P5c0
+Content-Type: application/json
+
+{
+  "itemId": "654a0b9b9de8213a74e2055b",
+  "username": "subhajit@49870",
+  "noOfQuantityToBuy": 10
+}
+
+###
+# group: Cart
+# @name show cart
+GET http://localhost:8080/api/order/cart?
+    username=subhajit@49870
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdWJoYWppdEA0OTg3MCIsImVtYWlsIjoic3ViaGFqaXRwYXRyYTQ5OEBnbWFpbC5jb20iLCJpYXQiOjE2OTkyNjUzNTUsImV4cCI6MTY5OTM1MTc1NX0.BWrtPNwqE6vVQkhhJTx4u5WZ_lb6FvpkwDESsX-WIzE
+
+###
+# group: Cart
+# @name deleteCartItem
+POST http://localhost:8080/api/order/deleteCartItem?
+    cartId=65468aefb72ecb5578d04b43
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdWJoYWppdEA0OTg3MCIsImVtYWlsIjoic3ViaGFqaXRwYXRyYTQ5OEBnbWFpbC5jb20iLCJpYXQiOjE2OTkxMjAyMTIsImV4cCI6MTY5OTIwNjYxMn0.r2VzmyhI-OhocnKsJL4bwymaJVWNUpTiaHoaSFYcj8U
+
+###
+# group: Order
+# @name buyitem
+POST http://localhost:8080/api/order/buy
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdWJoYWppdEA0OTg3MCIsImVtYWlsIjoic3ViaGFqaXRwYXRyYTQ5OEBnbWFpbC5jb20iLCJpYXQiOjE2OTkxMjAyMTIsImV4cCI6MTY5OTIwNjYxMn0.r2VzmyhI-OhocnKsJL4bwymaJVWNUpTiaHoaSFYcj8U
+Content-Type: application/json
+
+{
+  "medicineId": "651dd8d6f011985a17427726",
+  "noOfQuantityToBuy": "2",
+  "username": "subhajit@49870",
+  "email": "subhajitpatra498@gmail.com",
+  "address": "Ragpur,pingla,paschim medinipur",
+  "pinNumber": "721131",
+  "mobileNumber": "7047185721"
+}
+
+###
+# group: sample testing
+# @name testing Copy
+GET http://localhost:8080/api/test/user
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdWJoYWppdEA0OTg3MCIsImVtYWlsIjoic3ViaGFqaXRwYXRyYTQ5OEBnbWFpbC5jb20iLCJpYXQiOjE2OTkxMjAyMTIsImV4cCI6MTY5OTIwNjYxMn0.r2VzmyhI-OhocnKsJL4bwymaJVWNUpTiaHoaSFYcj8U

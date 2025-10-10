@@ -1,0 +1,10 @@
+###
+# group: Authentication
+# @name signin
+POST http://localhost:8765/auth-service/auth/signIn
+Content-Type: application/json
+
+{
+  "email":"subhajitpatra0011@gmail.com",
+  "password":"Subhajit@123456"
+}

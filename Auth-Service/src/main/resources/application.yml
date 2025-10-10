@@ -53,7 +53,7 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://service-registry:8761/eureka/
+      defaultZone: http://${DOCKER_EUREKA_HOST:localhost}:8761/eureka/
 management:
   endpoints:
     web:

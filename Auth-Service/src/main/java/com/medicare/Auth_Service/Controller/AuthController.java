@@ -43,6 +43,12 @@ public class AuthController {
         return ResponseEntity.ok(authResponse);
     }
 
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Boolean> forgotPassword(@RequestParam String email)
+    {
+        boolean sendOtp =authService.sendForgotPasswordOtp(email);
+        return ResponseEntity.ok(sendOtp);
+    }
     @PostMapping("/validate")
     public ResponseEntity<Boolean> validateToken(@RequestParam String token) {
         boolean isValid = authService.isValid(token);

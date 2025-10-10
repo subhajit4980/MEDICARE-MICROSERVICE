@@ -14,6 +14,7 @@ public class RouteValidator {
             "/auth/signIn",    // User login endpoint
             "/auth/signUp",    // User registration endpoint
             "/auth/send-otp",
+            "/auth/forgot-password",
             "/auth/verify-otp",
             "/auth/verify-User",
             "/auth/refreshToken",

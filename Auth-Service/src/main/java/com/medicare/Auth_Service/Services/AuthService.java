@@ -7,6 +7,7 @@ import com.medicare.Auth_Service.DTO.Request.SignUpRequest;
 import com.medicare.Auth_Service.DTO.Response.AuthResponse;
 import com.medicare.Auth_Service.DTO.Response.AuthResult;
 import com.medicare.Auth_Service.DTO.Response.UserDTO;
+import com.medicare.Auth_Service.Events.PasswordChangedOtpRequested;
 import com.medicare.Auth_Service.Events.UserVerificationRequested;
 import com.medicare.Auth_Service.Exception.UserException;
 import com.medicare.Auth_Service.Model.Enum.Role;
@@ -102,10 +103,9 @@ public class AuthService {
                 norm
         );
         log.info("-----> saved data in redis");
-        try{
-        kafkaTemplate.send("user-verification-topic", objectMapper.writeValueAsString(event));
-        }catch (Exception exeption)
-        {
+        try {
+            kafkaTemplate.send("user-verification-topic", objectMapper.writeValueAsString(event));
+        } catch (Exception exeption) {
             log.error("-----> {}", exeption.toString());
         }
         log.info("-----> Kafka topic send");
@@ -207,4 +207,62 @@ public class AuthService {
 
         return ResponseEntity.ok("Logged out successfully");
     }
+
+    public boolean sendForgotPasswordOtp(String email) {
+        try {
+            // Generate OTP
+            String otp = Common.generateOTP();
+
+            // Save OTP in Redis with expiry
+            String redisKey = "otp:password:" + email;
+            redisTemplate.opsForValue().set(redisKey, otp, 5, TimeUnit.MINUTES);
+            log.info("Saved password reset OTP in Redis for {}", email);
+
+            // Create event
+            PasswordChangedOtpRequested event = new PasswordChangedOtpRequested(otp, email);
+
+            // Send event to Kafka (synchronous send to ensure delivery)
+            kafkaTemplate.send("forgot-password-otp-topic", objectMapper.writeValueAsString(event)).get();
+            log.info("OTP event sent to Kafka for {}", email);
+
+            return true;
+        } catch (Exception e) {
+            log.error("Error while sending forgot password OTP", e);
+            return false;
+        }
+    }
+    public boolean validateForgotPasswordOtp(String email, String userOtp) {
+        try {
+            // Redis key (must match what you used when saving)
+            String redisKey = "otp:password:" + email;
+
+            // Get OTP from Redis
+            String storedOtp = Objects.requireNonNull(redisTemplate.opsForValue().get(redisKey)).toString();
+
+
+            if (storedOtp == null) {
+                log.warn("OTP expired or not found for {}", email);
+                return false; // OTP expired or not generated
+            }
+
+            // Compare values
+            if (storedOtp.equals(userOtp)) {
+                log.info("OTP validated successfully for {}", email);
+
+                // Optional: delete OTP immediately after success to prevent reuse
+                redisTemplate.delete(redisKey);
+
+                return true;
+            } else {
+                log.warn("Invalid OTP attempt for {}", email);
+                return false;
+            }
+
+        } catch (Exception e) {
+            log.error("Error validating OTP for {}: ", email, e);
+            return false;
+        }
+    }
+
+
 }
