@@ -1,8 +1,7 @@
 package com.medicare.User_Service.Exception;
 
 
-import com.medicare.Auth_Service.DTO.Response.ErrorResponse;
-import com.medicare.Auth_Service.Exception.UserException;
+import com.medicare.User_Service.Payload.Response.ErrorResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

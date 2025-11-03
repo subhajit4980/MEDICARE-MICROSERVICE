@@ -2,8 +2,9 @@ package com.medicare.User_Service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.medicare.User_Service")
 public class UserServiceApplication {
 
     public static void main(String[] args) {

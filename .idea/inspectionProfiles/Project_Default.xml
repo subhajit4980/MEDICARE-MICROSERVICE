@@ -12,6 +12,8 @@
           <option value="Payment-Service" />
           <option value="Product-Service" />
           <option value="User-Service" />
+          <option value="User-Service" />
+          <option value="User-Service" />
         </list>
       </option>
       <option name="ignoredPackages">
@@ -21,10 +23,14 @@
           <option value="org.springframework:spring-beans:6.2.9" />
           <option value="org.springframework:spring-beans:6.2.9" />
           <option value="org.springframework:spring-beans:6.2.9" />
+          <option value="org.apache.commons:commons-lang3:3.17.0" />
+          <option value="ch.qos.logback:logback-core:1.5.18" />
         </list>
       </option>
       <option name="ignoredReasons">
         <list>
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
           <option value="Not exploitable" />
           <option value="Not exploitable" />
           <option value="Not exploitable" />

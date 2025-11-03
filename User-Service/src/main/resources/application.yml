@@ -11,4 +11,4 @@ management:
         include: health,info
 spring:
   profiles:
-    active: prod
+    active: dev
