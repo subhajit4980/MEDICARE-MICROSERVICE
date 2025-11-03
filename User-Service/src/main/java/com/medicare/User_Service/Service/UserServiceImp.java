@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 
+import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -65,7 +66,7 @@ public class UserServiceImp implements UserService {
 
     @Override
     public List<Address> getAddress(String userId) {
-        return null;
+        return Collections.singletonList(addressRepository.findByUserId(userId).orElseThrow(() -> new UserException(HttpStatus.BAD_REQUEST, "Address not found")));
     }
 
     @Override
@@ -82,7 +83,15 @@ public class UserServiceImp implements UserService {
 
     @Override
     public MessageResponse deleteAddress(String userId, String addressId) {
-        return null;
+        Address address = addressRepository.findByAddressId(addressId)
+                .orElseThrow(() -> new UserException(HttpStatus.NOT_FOUND, "Address not found"));
+
+        if (!address.getUserId().equals(userId)) {
+            throw new UserException(HttpStatus.FORBIDDEN, "You are not authorized to delete this address");
+        }
+
+        addressRepository.delete(address);
+        return new MessageResponse("Address deleted successfully");
     }
 
     private void sanitizeAddressRequest(AddressRequest request) {
