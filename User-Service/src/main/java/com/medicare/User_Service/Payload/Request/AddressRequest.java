@@ -5,9 +5,6 @@ import lombok.Data;
 
 @Data
 public class AddressRequest {
-    private String addressId;
-    @NotBlank
-    private String userId; // Reference to the user
     @NotBlank
     private String name; // Name associated with the address (e.g., John Doe)
     @NotBlank
