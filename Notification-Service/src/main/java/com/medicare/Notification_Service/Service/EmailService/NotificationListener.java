@@ -1,6 +1,7 @@
 package com.medicare.Notification_Service.Service.EmailService;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.medicare.Notification_Service.Events.PasswordChangedOtpRequested;
 import com.medicare.Notification_Service.Events.UserRegisteredEvent;
 import com.medicare.Notification_Service.Events.UserVerificationRequested;
 import freemarker.template.Configuration;
@@ -53,5 +54,14 @@ public class NotificationListener {
         emailService.sendEmail(event.getEmail(), subject, t, model);
     }
 
-
+    @KafkaListener(topics = "forgot-password-otp-topic", groupId = "notification-group")
+    public void onPasswordChangedOtpRequested(String payload) throws Exception {
+        PasswordChangedOtpRequested event = objectMapper.readValue(payload, PasswordChangedOtpRequested.class);
+        Map<String, Object> model = new HashMap<>();
+        model.put("otp", event.getOtp());
+        config.setClassForTemplateLoading(this.getClass(), "/templates");
+        Template t = config.getTemplate("Password-Reset-Otp-template.ftl");
+        final String subject = "Your OTP Code for Password Update";
+        emailService.sendEmail(event.getEmail(), subject, t, model);
+    }
 }

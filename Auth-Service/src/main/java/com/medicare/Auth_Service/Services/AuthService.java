@@ -208,11 +208,12 @@ public class AuthService {
         return ResponseEntity.ok("Logged out successfully");
     }
 
+    @Transactional
     public boolean sendForgotPasswordOtp(String email) {
         try {
             // Generate OTP
             String otp = Common.generateOTP();
-
+            if (!email.contains("@gmail.com")) throw new UserException(HttpStatus.BAD_REQUEST, "EMAIL_NOT_VALID");
             // Save OTP in Redis with expiry
             String redisKey = "otp:password:" + email;
             redisTemplate.opsForValue().set(redisKey, otp, 5, TimeUnit.MINUTES);
@@ -231,6 +232,7 @@ public class AuthService {
             return false;
         }
     }
+
     public boolean validateForgotPasswordOtp(String email, String userOtp) {
         try {
             // Redis key (must match what you used when saving)
@@ -264,5 +266,12 @@ public class AuthService {
         }
     }
 
+    @Transactional
+    public String updatePassword(String password, String email) throws UserException {
+        User user = repository.findByEmail(email.toUpperCase(Locale.ROOT)).orElseThrow(() -> new UserException(HttpStatus.BAD_REQUEST, "USER_NOT_EXIST"));
+        user.setPassword(encoder.encode(password));
+        repository.save(user);
+        return "Password updated successfully";
+    }
 
 }

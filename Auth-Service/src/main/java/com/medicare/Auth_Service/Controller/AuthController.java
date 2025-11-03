@@ -44,11 +44,23 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<Boolean> forgotPassword(@RequestParam String email)
-    {
-        boolean sendOtp =authService.sendForgotPasswordOtp(email);
+    public ResponseEntity<Boolean> forgotPassword(@RequestParam String email) {
+        boolean sendOtp = authService.sendForgotPasswordOtp(email);
         return ResponseEntity.ok(sendOtp);
     }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<Boolean> verifyOtp(@RequestParam String email, @RequestParam String otp) {
+        boolean validOtp = authService.validateForgotPasswordOtp(email, otp);
+        return ResponseEntity.ok(validOtp);
+    }
+
+    @PostMapping("/update-password")
+    public ResponseEntity<String> updatePassword(@RequestParam String email, @RequestParam String password) {
+        String msg = authService.updatePassword(password, email);
+        return ResponseEntity.ok(msg);
+    }
+
     @PostMapping("/validate")
     public ResponseEntity<Boolean> validateToken(@RequestParam String token) {
         boolean isValid = authService.isValid(token);

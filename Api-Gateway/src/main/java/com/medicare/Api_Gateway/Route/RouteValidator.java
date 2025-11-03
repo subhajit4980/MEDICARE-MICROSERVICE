@@ -17,6 +17,7 @@ public class RouteValidator {
             "/auth/forgot-password",
             "/auth/verify-otp",
             "/auth/verify-User",
+            "/auth/update-password",
             "/auth/refreshToken",
             "/auth/google-login",
             "/auth/.well-known/jwks.json",
