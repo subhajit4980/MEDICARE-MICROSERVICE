@@ -3,7 +3,7 @@ package com.medicare.User_Service.Controller;
 import com.medicare.User_Service.Models.Address;
 import com.medicare.User_Service.Payload.Request.AddressRequest;
 import com.medicare.User_Service.Payload.Response.MessageResponse;
-import com.medicare.User_Service.Service.UserService;
+import com.medicare.User_Service.Service.UserServiceImp;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,7 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/user")
 public class UserController {
-    private final UserService userService;
+    private final UserServiceImp userService;
     @PostMapping("/addAddress")
     public ResponseEntity<MessageResponse> addAddress(@Valid @RequestBody AddressRequest addressRequest){
         MessageResponse messageResponse=userService.addAddresses(addressRequest);
