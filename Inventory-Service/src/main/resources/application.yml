@@ -9,3 +9,13 @@ management:
     web:
       exposure:
         include: health,info
+openapi:
+  service:
+    title: inventory-service doc
+    version: 1.0.0
+    url: http://${DOCKER_API_GATEWAY_HOST:localhost}:8765 #api gateway url
+springdoc:
+  api-docs:
+    path: /inventory-service/v3/api-docs
+  swagger-ui:
+    path: /inventory-service/swagger-ui.html

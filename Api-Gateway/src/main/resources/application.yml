@@ -3,59 +3,66 @@ spring:
     name: API-GATEWAY
   cloud:
     gateway:
-      default-filters:
-        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
-      globalcors:
-        corsConfigurations:
-          '[/**]':
-            allowedOrigins: "*"
-            allowedMethods: "*"
-            allowedHeaders: "*"
       server:
         webflux:
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOrigins: "*"
+                allowedMethods: "*"
+                allowedHeaders: "*"
+          default-filters:
+            - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
           routes:
-            - id: AUTH-SERVICE
+            # existing routes...
+            - id: AUTH-SERVICE-DOCS
               uri: lb://AUTH-SERVICE
               predicates:
-                - Path=/auth/**
+                - Path=/docs/auth-service/**
               filters:
-                - name: JwtAuth
-            - id: INVENTORY-SERVICE
+                - RewritePath=/docs/auth-service/(?<segment>.*), /${segment}
+
+            - id: INVENTORY-SERVICE-DOCS
               uri: lb://INVENTORY-SERVICE
               predicates:
-                - Path=/inventory/**
+                - Path=/docs/inventory-service/**
               filters:
-                - name: JwtAuth
-            - id: NOTIFICATION-SERVICE
+                - RewritePath=/docs/inventory-service/(?<segment>.*), /${segment}
+
+            - id: NOTIFICATION-SERVICE-DOCS
               uri: lb://NOTIFICATION-SERVICE
               predicates:
-                - Path=/notification/**
+                - Path=/docs/notification-service/**
               filters:
-                - name: JwtAuth
-            - id: ORDER-SERVICE
+                - RewritePath=/docs/notification-service/(?<segment>.*), /${segment}
+
+            - id: ORDER-SERVICE-DOCS
               uri: lb://ORDER-SERVICE
               predicates:
-                - Path=/order/**
+                - Path=/docs/order-service/**
               filters:
-                - name: JwtAuth
-            - id: PAYMENT-SERVICE
+                - RewritePath=/docs/order-service/(?<segment>.*), /${segment}
+
+            - id: PAYMENT-SERVICE-DOCS
               uri: lb://PAYMENT-SERVICE
               predicates:
-                - Path=/payment/**
+                - Path=/docs/payment-service/**
               filters:
-                - name: JwtAuth
-            - id: PRODUCT-SERVICE
+                - RewritePath=/docs/payment-service/(?<segment>.*), /${segment}
+
+            - id: PRODUCT-SERVICE-DOCS
               uri: lb://PRODUCT-SERVICE
               predicates:
-                - Path=/product/**
+                - Path=/docs/product-service/**
               filters:
-                - name: JwtAuth
-            - id: USER-SERVICE
+                - RewritePath=/docs/product-service/(?<segment>.*), /${segment}
+
+            - id: USER-SERVICE-DOCS
               uri: lb://USER-SERVICE
               predicates:
-                - Path=/user/**
+                - Path=/docs/user-service/**
               filters:
-                - name: JwtAuth
+                - RewritePath=/docs/user-service/(?<segment>.*), /${segment}
 eureka:
   client:
     register-with-eureka: true
@@ -67,3 +74,30 @@ management:
     web:
       exposure:
         include: health,info
+  main:
+    web-application-type: reactive
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    config-url: /v3/api-docs/swagger-config
+    urls:
+      - url: /v3/api-docs
+        name: API Gateway
+      - url: /docs/auth-service/v3/api-docs
+        name: Auth Service
+      - url: /docs/inventory-service/v3/api-docs
+        name: Inventory Service
+      - url: /docs/notification-service/v3/api-docs
+        name: Notification Service
+      - url: /docs/order-service/v3/api-docs
+        name: Order Service
+      - url: /docs/payment-service/v3/api-docs
+        name: Payment Service
+      - url: /docs/product-service/v3/api-docs
+        name: Product Service
+      - url: /docs/user-service/v3/api-docs
+        name: User Service
