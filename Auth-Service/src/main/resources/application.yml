@@ -1,71 +1,138 @@
-server:
-  port: 8085                           # The port your Auth server will run on (http://localhost:9000)
-
-app:
-  issuer: http://localhost:9000        # The "issuer" value in your JWT tokens (must be HTTPS in production)
-  audience: medicare-api               # The intended audience for tokens; usually matches your API
-  access-token-mins: 15                # Token validity time in minutes for Access Tokens
-  refresh-token-days: 7                # Token validity time in days for Refresh Tokens
-  jwks:
-    key-id: auth-key-2025              # Unique key ID (kid) for JWT signing; rotate keys by changing this
-    rsa:
-      public-key-b64: ${PUBLIC_KEY}
-      private-key-b64: ${PRIVATE_KEY}
-
 spring:
+  application:
+    name: Auth-Service   # Name of this microservice (used by Eureka & Spring logs)
+
+  data:
+    mongodb:
+      # MongoDB Atlas connection URI (username & password come from environment)
+      uri: mongodb+srv://${mongoDB_username}:${mongoDB_Password}@medicare.qzyf5vd.mongodb.net/?retryWrites=true&w=majority
+      database: Medicare   # Database name inside MongoDB
+
+    redis:
+      # Redis used for caching, sessions, token blacklisting, etc.
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
   security:
     oauth2:
       client:
         registration:
           google:
-            client-id: ${GOOGLE_CLIENT_ID}            # Google OAuth2 Client ID (set in environment variables)
-            client-secret: ${GOOGLE_CLIENT_SECRET}    # Google OAuth2 Client Secret (also in environment variables)
-            redirect-uri: http://localhost:8085/login/oauth2/code/google
-            # Where Google will redirect after login (must match in Google console)
-            scope: openid, profile, email            # Scopes requested from Google (basic profile info + email)
+            # Google OAuth2 client credentials
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
 
+            # Google redirects back to this URL after successful login
+            redirect-uri: http://localhost:8085/login/oauth2/code/google
+
+            # Basic user info access
+            scope:
+              - openid
+              - profile
+              - email
         provider:
           google:
-            issuer-uri: https://accounts.google.com  # Google's OpenID Connect issuer URI (used for JWT validation)
+            # Google's OpenID issuer for token validation
+            issuer-uri: https://accounts.google.com
+
   kafka:
+    # Kafka broker location
     bootstrap-servers: localhost:9092
+
     producer:
-      transaction-id-prefix: tx-   # optional (we use executeInTransaction in processor)
+      # Enables transactional Kafka producer
+      transaction-id-prefix: tx-
+
+      # Key and value serializers
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
       properties:
-        enable.idempotence: true   # ensure idempotent producer
-        acks: all
+        enable.idempotence: true   # Prevents duplicate message delivery
+        acks: all                  # Ensures full commit from all replicas
+
     consumer:
+      # Key and value deserializers
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
       properties:
-        spring.json.trusted.packages: "*"
+        spring.json.trusted.packages: "*"   # Allows deserialization from all packages
         transaction:
           id:
-            prefix: tx-
-  data:
-    redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${ REDIS_PORT:6379 }
+            prefix: tx-   # Enables transactional consumption support
+
+cloud:
+  openfeign:
+    discovery:
+      enabled: true   # Enables Feign client discovery via Eureka
+
+server:
+  address: 0.0.0.0   # Allows access from outside the local machine
+  port: 8085        # Main port of the Auth Service
+
+app:
+  # JWT issuer — must match what you embed in generated tokens
+  issuer: http://localhost:9000
+
+  # JWT intended audience
+  audience: medicare-api
+
+  # Access token validity (in minutes)
+  access-token-mins: 15
+
+  # Refresh token validity (in days)
+  refresh-token-days: 7
+
+  jwks:
+    # JWT signing key ID (used for key rotation)
+    key-id: auth-key-2025
+
+    rsa:
+      # Base64-encoded RSA public key
+      public-key-b64: ${PUBLIC_KEY}
+
+      # Base64-encoded RSA private key
+      private-key-b64: ${PRIVATE_KEY}
+
 eureka:
+  instance:
+    prefer-ip-address: true      # Registers with IP instead of hostname
+    hostname: ${HOST_AUTH:localhost}
+
   client:
-    register-with-eureka: true
-    fetch-registry: true
+    register-with-eureka: true  # Registers this service with Eureka
+    fetch-registry: true        # Fetches list of all other services
+
     service-url:
-      defaultZone: http://${DOCKER_EUREKA_HOST:localhost}:8761/eureka/
+      # Eureka server location
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+
 management:
+  server:
+    # Separate port for actuator endpoints
+    port: ${MANAGEMENT_PORT:8081}
+
+  endpoint:
+    health:
+      enabled: true                        # Enables /actuator/health
+      show-details: when_authorized       # Shows details only when authorized
+      group:
+        custom:
+          show-components: always         # Always show individual health components
+          show-details: always            # Always show health details
+
   endpoints:
     web:
       exposure:
-        include: health,info
-openapi:
-  service:
-    title: auth-service doc
-    version: 1.0.0
-    url: http://${DOCKER_API_GATEWAY_HOST:localhost}:8765 #api gateway url
+        # Exposes selected actuator endpoints over HTTP
+        include: health,info,prometheus,metrics,env,health/readiness
+
 springdoc:
   api-docs:
+    # OpenAPI JSON endpoint
     path: /auth-service/v3/api-docs
+
   swagger-ui:
+    # Swagger UI page
     path: /auth-service/swagger-ui.html

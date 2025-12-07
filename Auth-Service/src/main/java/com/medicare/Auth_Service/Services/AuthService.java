@@ -237,7 +237,7 @@ public class AuthService {
         try {
             // Redis key (must match what you used when saving)
             String redisKey = "otp:password:" + email;
-
+            System.out.println(redisKey +" 🔑🔑🔑");
             // Get OTP from Redis
             String storedOtp = Objects.requireNonNull(redisTemplate.opsForValue().get(redisKey)).toString();
 

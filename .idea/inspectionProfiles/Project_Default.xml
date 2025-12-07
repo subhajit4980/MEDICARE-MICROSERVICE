@@ -20,6 +20,8 @@
           <option value="Order-Service" />
           <option value="Order-Service" />
           <option value="Order-Service" />
+          <option value="Auth-Service" />
+          <option value="Auth-Service" />
         </list>
       </option>
       <option name="ignoredPackages">
@@ -37,10 +39,14 @@
           <option value="ch.qos.logback:logback-core:1.5.18" />
           <option value="org.springframework:spring-beans:6.2.9" />
           <option value="org.apache.commons:commons-lang3:3.17.0" />
+          <option value="com.thoughtworks.xstream:xstream:1.4.20" />
+          <option value="org.apache.httpcomponents:httpclient:4.5.3" />
         </list>
       </option>
       <option name="ignoredReasons">
         <list>
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
           <option value="Not exploitable" />
           <option value="Not exploitable" />
           <option value="Not exploitable" />

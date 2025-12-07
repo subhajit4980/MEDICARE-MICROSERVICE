@@ -17,7 +17,7 @@
         </processorPath>
         <module name="Api-Gateway" />
       </profile>
-      <profile name="Annotation profile for Product-Service" enabled="true">
+      <profile name="Annotation profile for User-Service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
