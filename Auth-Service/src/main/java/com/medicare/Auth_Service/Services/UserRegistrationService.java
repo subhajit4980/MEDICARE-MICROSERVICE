@@ -37,22 +37,28 @@ public class UserRegistrationService {
         TransactionTemplate txTemplate = new TransactionTemplate(txManager);
 
         return txTemplate.execute(status -> {
+
             User user = (User) redisTemplate.opsForValue().get(email);
             if (user == null) {
-                throw new UserException(HttpStatus.INTERNAL_SERVER_ERROR, "User data not found in Redis");
+                // UPDATED: throw UserException instead of RuntimeException
+                throw new UserException(
+                        HttpStatus.NOT_FOUND,
+                        "User data not found in Redis",
+                        "AUTH_USER_NOT_FOUND"
+                );
             }
 
-            // Mark as verified
+            // Mark user as verified
             user.setVerified(true);
 
             // Save to MongoDB
             User saved = repository.save(user);
 
-            // Issue tokens
+            // Issue JWT tokens
             String refresh = jwtService.issueRefreshToken(saved.getUserId());
             String access = jwtService.issueAccessToken(saved);
 
-            // Save tokens + cookie
+            // Persist tokens + cookie
             tokenService.saveUserToken(saved, access, refresh);
             tokenService.storeRefreshCookie(refresh, response);
 
@@ -63,16 +69,25 @@ public class UserRegistrationService {
                         saved.getEmail(),
                         saved.getFirstName() + " " + saved.getLastName()
                 );
+
                 String json = objectMapper.writeValueAsString(payload);
 
                 OutboxEvent ev = new OutboxEvent();
                 ev.setAggregateId(saved.getUserId());
                 ev.setEventType("USER_REGISTERED");
                 ev.setPayload(json);
+
                 outboxRepository.save(ev);
                 redisTemplate.delete(email);
+
             } catch (JsonProcessingException e) {
-                throw new RuntimeException("Failed to serialize event payload", e);
+
+                // UPDATED: replaced RuntimeException with UserException
+                throw new UserException(
+                        HttpStatus.INTERNAL_SERVER_ERROR,
+                        "Failed to serialize event payload",
+                        "AUTH_OUTBOX_SERIALIZATION_ERROR"
+                );
             }
 
             return new AuthResult(saved, access);
