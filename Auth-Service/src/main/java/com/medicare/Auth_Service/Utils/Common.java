@@ -7,12 +7,14 @@ import java.util.List;
 
 public class Common {
     public static List<String> validatePassword(String password) {
-        List<String> missingCharTypes = new ArrayList<>();
-        if (!password.matches(".*\\d.*")) missingCharTypes.add("Digit");
-        if (!password.matches(".*[a-z].*")) missingCharTypes.add("Lowercase letter");
-        if (!password.matches(".*[A-Z].*")) missingCharTypes.add("Uppercase letter");
-        if (!password.matches(".*[@#$%^&+=!].*")) missingCharTypes.add("Special character");
-        return missingCharTypes;
+        List<String> validationTypes = new ArrayList<>();
+        if (!password.matches(".*\\d.*")) validationTypes.add("add at least one Digit");
+        if (!password.matches(".*[a-z].*")) validationTypes.add("add at least one Lowercase letter");
+        if (!password.matches(".*[A-Z].*")) validationTypes.add("add at least one Uppercase letter");
+        if (!password.matches(".*[@#$%^&+=!].*")) validationTypes.add("add at least one Special character");
+        if (!password.matches(".{8,}")) validationTypes.add( "Password length must be >= 8");
+        if (password.matches(".*\\s.*")) validationTypes.add( "Password must not contain spaces");
+        return validationTypes;
     }
 
     // Generate OTP

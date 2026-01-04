@@ -126,7 +126,7 @@ management:
     web:
       exposure:
         # Exposes selected actuator endpoints over HTTP
-        include: health,info,prometheus,metrics,env,health/readiness
+        include: health,info,prometheus,metrics,env,health
 
 springdoc:
   api-docs:

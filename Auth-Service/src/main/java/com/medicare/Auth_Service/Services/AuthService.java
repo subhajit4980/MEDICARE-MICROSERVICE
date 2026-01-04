@@ -70,17 +70,16 @@ public class AuthService {
         String norm = request.getEmail().trim().toLowerCase(Locale.ROOT);
 
         // Validate email
-        if (!norm.contains("@")) throw new UserException(HttpStatus.BAD_REQUEST, "Email is not valid", "AUTH_INVALID_EMAIL");
-        if (repository.existsByEmail(norm)) throw new UserException(HttpStatus.CONFLICT, "User already registered", "AUTH_USER_EXISTS");
+        if (!norm.contains("@"))
+            throw new UserException(HttpStatus.BAD_REQUEST, "Email is not valid", "AUTH_INVALID_EMAIL");
+        if (repository.existsByEmail(norm))
+            throw new UserException(HttpStatus.CONFLICT, "User already registered", "AUTH_USER_EXISTS");
 
         // Password validation rules
-        var charlist = Common.validatePassword(request.getPassword());
-        if (request.getPassword().length() < 8)
-            throw new UserException(HttpStatus.NOT_ACCEPTABLE, "Password length must be >= 8", "AUTH_PASSWORD_TOO_SHORT");
-        if (request.getPassword().contains(" "))
-            throw new UserException(HttpStatus.NOT_ACCEPTABLE, "Password must not contain spaces", "AUTH_PASSWORD_INVALID");
-        if (!charlist.isEmpty())
-            throw new UserException(HttpStatus.NOT_ACCEPTABLE, "Password invalid: " + charlist, "AUTH_PASSWORD_INVALID_CHARS");
+        var errorValidation = Common.validatePassword(request.getPassword());
+        if (!errorValidation.isEmpty())
+            throw new UserException(HttpStatus.NOT_ACCEPTABLE, "Password invalid: please "
+                    + String.join(",", errorValidation), "AUTH_PASSWORD_INVALID");
         log.info("-----> User creating");
 
         // Create user object
@@ -153,7 +152,8 @@ public class AuthService {
 
         // Authenticate credentials using Spring Security
         Authentication auth = authentication(norm, request.getPassword());
-        if (!auth.isAuthenticated()) throw new UserException(HttpStatus.BAD_REQUEST, "Wrong Credentials Provided", "AUTH_BAD_CREDENTIALS");
+        if (!auth.isAuthenticated())
+            throw new UserException(HttpStatus.BAD_REQUEST, "Wrong Credentials Provided", "AUTH_BAD_CREDENTIALS");
 
         // Generate tokens
         String access = jwtService.issueAccessToken(user);
@@ -227,7 +227,8 @@ public class AuthService {
         try {
             // Generate OTP
             String otp = Common.generateOTP();
-            if (!email.contains("@gmail.com")) throw new UserException(HttpStatus.BAD_REQUEST, "EMAIL_NOT_VALID", "AUTH_EMAIL_INVALID");
+            if (!email.contains("@gmail.com"))
+                throw new UserException(HttpStatus.BAD_REQUEST, "EMAIL_NOT_VALID", "AUTH_EMAIL_INVALID");
             // Save OTP in Redis with expiry
             String redisKey = "otp:password:" + email;
             redisTemplate.opsForValue().set(redisKey, otp, 5, TimeUnit.MINUTES);
@@ -295,7 +296,11 @@ public class AuthService {
 
     @Transactional
     public String updatePassword(String password, String email) throws UserException {
-        User user = repository.findByEmail(email.toUpperCase(Locale.ROOT)).orElseThrow(() -> new UserException(HttpStatus.BAD_REQUEST, "USER_NOT_EXIST", "AUTH_USER_NOT_EXIST"));
+        var errorValidation = Common.validatePassword(password);
+        if (!errorValidation.isEmpty())
+            throw new UserException(HttpStatus.NOT_ACCEPTABLE, "Password invalid: please "
+                    + String.join(",", errorValidation), "AUTH_PASSWORD_INVALID");
+        User user = repository.findByEmail(email.toLowerCase(Locale.ROOT)).orElseThrow(() -> new UserException(HttpStatus.BAD_REQUEST, "USER_NOT_EXIST", "AUTH_USER_NOT_EXIST"));
         user.setPassword(encoder.encode(password));
         repository.save(user);
         return "Password updated successfully";

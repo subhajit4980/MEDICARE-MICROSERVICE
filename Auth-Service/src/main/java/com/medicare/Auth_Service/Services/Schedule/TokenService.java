@@ -50,6 +50,7 @@ public class TokenService {
                 .createdAt(now)
                 .expiresAt(refreshExp)
                 .build();
+        //
         refreshTokenRepository.save(rt);
     }
 
@@ -86,6 +87,7 @@ public class TokenService {
     /**
      * Rotate tokens and issue a new access + refresh when access expires.
      */
+    @Transactional
     public void refreshAccessToken(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String refreshToken = getRefreshTokenFromCookie(request);
         if (refreshToken == null) {
