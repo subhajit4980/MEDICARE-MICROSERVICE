@@ -1,5 +1,6 @@
 package com.medicare.Auth_Service.Config;
 
+import com.medicare.Auth_Service.Repositories.UserRepository;
 import com.medicare.Auth_Service.Services.CustomUserDetailsService;
 import com.medicare.Auth_Service.Services.TokenService.AuthEntryPointJwt;
 import lombok.RequiredArgsConstructor;
@@ -26,12 +27,13 @@ public class AuthConfig {
     private final AuthEntryPointJwt point;
     //    private final OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService;
     private final AuthenticationSuccessHandler oauth2SuccessHandler;
+    private final CustomUserDetailsService userDetailsService;
 
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return new CustomUserDetailsService();
-    }
+//    @Bean
+//    public UserDetailsService userDetailsService() {
+//        return new CustomUserDetailsService();
+//    }
 
 
     @Bean
@@ -62,7 +64,7 @@ public class AuthConfig {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService());
+        authenticationProvider.setUserDetailsService(userDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;
     }

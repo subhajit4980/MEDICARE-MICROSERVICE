@@ -87,9 +87,8 @@ public class JwtAuthGatewayFilterFactory extends AbstractGatewayFilterFactory<Jw
 
             // If jwkSet not ready, block request with 503
             if (jwkSet == null) {
-                log.error("[ERROR] {} → Auth-Service not available, cannot validate JWT", path);
-                return Mono.error(new UserException(HttpStatus.SERVICE_UNAVAILABLE,
-                        "Auth-Service not available. Please try again later."));
+                log.error("[ERROR] {} → Auth-Service not connected to api gateway ❌", path);
+                refreshAuthServiceJwk();
             }
 
             String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);

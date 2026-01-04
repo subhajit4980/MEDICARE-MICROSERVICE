@@ -178,6 +178,7 @@ public class AuthService {
             return authentication;
         } catch (org.springframework.security.core.AuthenticationException e) {
             // UPDATED: convert to domain-level exception to be handled by GlobalExceptionHandler
+            log.error(e.toString());
             throw new UserException(HttpStatus.BAD_REQUEST, "Wrong Credentials Provided", "AUTH_BAD_CREDENTIALS");
         }
     }

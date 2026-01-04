@@ -15,7 +15,7 @@ import java.util.Locale;
 @Component
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
     @Override
@@ -23,6 +23,9 @@ public class CustomUserDetailsService implements UserDetailsService {
         String norm = email.trim().toLowerCase(Locale.ROOT);
         User user = userRepository.findByEmail(norm)
                 .orElseThrow(() -> new UsernameNotFoundException("user not found with email: " + email));
+        if (!user.getVerified()) {
+            throw new UsernameNotFoundException("User not verified");
+        }
         return new CustomUserDetails(user);
     }
 }
