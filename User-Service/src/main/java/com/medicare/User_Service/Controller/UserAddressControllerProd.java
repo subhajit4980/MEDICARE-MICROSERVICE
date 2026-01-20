@@ -18,15 +18,15 @@ import java.util.List;
 @Profile("prod")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/users/")
-public class UserControllerProd {
+@RequestMapping("/user/address")
+public class UserAddressControllerProd {
 
     private final UserService userService;
 
     /**
      * Add a new address for the authenticated user
      */
-    @PostMapping("/address")
+    @PostMapping("/addAddress")
     public ResponseEntity<MessageResponse> addAddress(
             HttpServletRequest request,
             @Valid @RequestBody AddressRequest addressRequest) {

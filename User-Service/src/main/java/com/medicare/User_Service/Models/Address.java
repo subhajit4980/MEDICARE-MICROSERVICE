@@ -24,6 +24,8 @@ public class Address {
     @NotBlank
     private String street; // Street address
     @NotBlank
+    private String landMark; // nearest landmark
+    @NotBlank
     private String city; // City
     @NotBlank
     private String state; // State or Province

@@ -11,7 +11,7 @@ management:
         include: health,info
 spring:
   profiles:
-    active: dev
+    active: prod
 springdoc:
   api-docs:
     enabled: true

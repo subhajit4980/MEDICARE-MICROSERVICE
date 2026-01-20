@@ -13,9 +13,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImp implements UserService {
@@ -23,6 +25,8 @@ public class UserServiceImp implements UserService {
     ModelMapper modelMapper = new ModelMapper();
     private final AddressRepository addressRepository;
 
+    @Transactional
+    @Override
     public MessageResponse addAddresses(String userId, AddressRequest addressRequest) {
         try {
             // 1. Validate input
@@ -34,10 +38,11 @@ public class UserServiceImp implements UserService {
             // 3. Map DTO → Entity
             Address newAddress = modelMapper.map(addressRequest, Address.class);
             newAddress.setDefault(false);
+            newAddress.setUserId(userId);
             // 4. Save securely
             addressRepository.save(newAddress);
             // 5. Return success message
-            return new MessageResponse("Address added successfully");
+            return new MessageResponse("Address added successfully",newAddress);
 
         } catch (UserException e) {
             throw e;
@@ -48,9 +53,10 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
+    @Transactional
     public MessageResponse updateAddress(@Valid String userId, String addressId, AddressRequest addressRequest) {
         try {
-            Address userAddress = addressRepository.findByAddressId(addressId)
+            Address userAddress = addressRepository.findById(addressId)
                     .orElseThrow(() -> new UserException(HttpStatus.NOT_FOUND, "Address not found"));
             if (userAddress.getUserId() == null || !userAddress.getUserId().equals(userId)) {
                 throw new UserException(HttpStatus.FORBIDDEN, "You are not authorized to modify this address");
@@ -58,7 +64,7 @@ public class UserServiceImp implements UserService {
             sanitizeAddressRequest(addressRequest);
             modelMapper.map(addressRequest, userAddress);
             addressRepository.save(userAddress);
-            return new MessageResponse("Address updated successfully");
+            return new MessageResponse("Address updated successfully",userAddress);
         } catch (Exception e) {
             log.error("Error adding address for user: {}", e.getMessage(), e);
             throw new UserException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to update address");
@@ -72,7 +78,7 @@ public class UserServiceImp implements UserService {
 
     @Override
     public Address getAddressById(String userId, String addressId) {
-        Address address = addressRepository.findByAddressId(addressId)
+        Address address = addressRepository.findById(addressId)
                 .orElseThrow(() -> new UserException(HttpStatus.NOT_FOUND, "Address not found"));
 
         if (!address.getUserId().equals(userId)) {
@@ -83,8 +89,9 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
+    @Transactional
     public MessageResponse deleteAddress(String userId, String addressId) {
-        Address address = addressRepository.findByAddressId(addressId)
+        Address address = addressRepository.findById(addressId)
                 .orElseThrow(() -> new UserException(HttpStatus.NOT_FOUND, "Address not found"));
 
         if (!address.getUserId().equals(userId)) {
@@ -92,7 +99,7 @@ public class UserServiceImp implements UserService {
         }
 
         addressRepository.delete(address);
-        return new MessageResponse("Address deleted successfully");
+        return new MessageResponse("Address deleted successfully",address);
     }
 
     private void sanitizeAddressRequest(AddressRequest request) {

@@ -160,7 +160,7 @@ public class TokenService {
         Cookie refreshCookie = new Cookie("__Secure-med-srt", token);
         refreshCookie.setHttpOnly(true);                       // Prevent JavaScript access
         refreshCookie.setSecure(true);                         // Send only over HTTPS
-        refreshCookie.setPath("/");                            // Cookie valid across all endpoints
+        refreshCookie.setPath("/auth/refresh");                            // Cookie valid across all endpoints
         refreshCookie.setMaxAge((int) Duration.ofDays(7).getSeconds());  // Expiration
         refreshCookie.setAttribute("SameSite", "Strict");      // CSRF protection
         response.addCookie(refreshCookie);

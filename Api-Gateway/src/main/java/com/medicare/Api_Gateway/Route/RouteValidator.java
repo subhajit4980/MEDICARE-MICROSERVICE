@@ -19,6 +19,7 @@ public class RouteValidator {
             "/auth/verify-User",
             "/auth/update-password",
             "/auth/refreshToken",
+            "/auth/validate",
             "/auth/google-login",
             "/auth/.well-known/jwks.json",
             "/api/eureka" ,        // Eureka service registry (should remain open)
