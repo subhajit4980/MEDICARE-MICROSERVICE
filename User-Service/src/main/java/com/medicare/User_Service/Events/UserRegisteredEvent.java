@@ -1,4 +1,4 @@
-package com.medicare.Notification_Service.Events;
+package com.medicare.User_Service.Events;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

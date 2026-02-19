@@ -1,7 +1,8 @@
-package com.medicare.Auth_Service.Services.TokenService;
+package com.medicare.Auth_Service.Services.Schedule;
 
 import com.medicare.Auth_Service.Model.RefreshToken;
 import com.medicare.Auth_Service.Repositories.RefreshTokenRepository;
+import com.medicare.Auth_Service.Services.TokenService.JwtService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;

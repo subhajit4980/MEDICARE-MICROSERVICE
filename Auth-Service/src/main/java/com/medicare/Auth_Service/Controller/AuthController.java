@@ -5,7 +5,7 @@ import com.medicare.Auth_Service.DTO.Request.SignInRequest;
 import com.medicare.Auth_Service.DTO.Request.SignUpRequest;
 import com.medicare.Auth_Service.DTO.Response.AuthResponse;
 import com.medicare.Auth_Service.Services.AuthService;
-import com.medicare.Auth_Service.Services.Schedule.TokenService;
+import com.medicare.Auth_Service.Services.TokenService.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

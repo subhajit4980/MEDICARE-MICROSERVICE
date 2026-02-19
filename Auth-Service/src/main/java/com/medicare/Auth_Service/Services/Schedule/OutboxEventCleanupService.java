@@ -33,6 +33,7 @@ public class OutboxEventCleanupService {
         outboxRepository.deleteByPublishedTrueAndCreatedAtBefore(
                 Instant.now().minus(7, ChronoUnit.DAYS)
         );
+        System.out.println("✅ Events cleanup run completed at: " + new java.util.Date());
     }
 
 }

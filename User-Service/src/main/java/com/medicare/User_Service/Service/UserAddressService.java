@@ -6,7 +6,7 @@ import com.medicare.User_Service.Payload.Response.MessageResponse;
 
 import java.util.List;
 
-public interface UserService {
+public interface UserAddressService {
     MessageResponse addAddresses( String userId, AddressRequest addressRequest);
     MessageResponse updateAddress( String userId, String addressId, AddressRequest addressRequest);
     List<Address> getAddress( String userId);

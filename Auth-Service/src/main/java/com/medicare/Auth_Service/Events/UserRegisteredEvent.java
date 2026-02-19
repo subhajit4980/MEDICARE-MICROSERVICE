@@ -14,6 +14,7 @@ public class UserRegisteredEvent {
     @NotBlank
     @Size(max = 50)
     String email;
-    String fullName;
+    String firstName;
+    String lastName;
 
 }

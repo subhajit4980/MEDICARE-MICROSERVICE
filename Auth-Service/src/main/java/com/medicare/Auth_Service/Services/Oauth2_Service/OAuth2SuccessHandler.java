@@ -3,9 +3,10 @@ package com.medicare.Auth_Service.Services.Oauth2_Service;
 import com.medicare.Auth_Service.DTO.Response.AuthResult;
 import com.medicare.Auth_Service.Model.Enum.Role;
 import com.medicare.Auth_Service.Model.User;
+import com.medicare.Auth_Service.Model.UserCacheData;
 import com.medicare.Auth_Service.Repositories.UserRepository;
 import com.medicare.Auth_Service.Services.TokenService.JwtService;
-import com.medicare.Auth_Service.Services.Schedule.TokenService;
+import com.medicare.Auth_Service.Services.TokenService.TokenService;
 import com.medicare.Auth_Service.Services.UserRegistrationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -51,14 +52,15 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                 .orElseGet(() -> {
                     User u = new User();
                     u.setEmail(norm);
-                    u.setFirstName(firstName);
-                    u.setLastName(lastName);
+//                    u.setFirstName(firstName);
+//                    u.setLastName(lastName);
                     // Assign default role if null
                     if (u.getRole() == null) {
                         u.setRole(Role.USER);
                     }
                     u.setGoogleSub(sub);
-                    redisTemplate.opsForValue().set(norm, u, 60, TimeUnit.MINUTES);
+                    UserCacheData userCacheData=new UserCacheData(u,firstName,lastName);
+                    redisTemplate.opsForValue().set(norm, userCacheData, 60, TimeUnit.MINUTES);
                     return userRegistrationService.finalizeRegistration(norm, response);
                 });
         response.setContentType("application/json");

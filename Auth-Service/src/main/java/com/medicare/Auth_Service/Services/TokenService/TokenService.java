@@ -1,4 +1,4 @@
-package com.medicare.Auth_Service.Services.Schedule;
+package com.medicare.Auth_Service.Services.TokenService;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.medicare.Auth_Service.DTO.Response.AuthResponse;
@@ -9,7 +9,6 @@ import com.medicare.Auth_Service.Model.RefreshToken;
 import com.medicare.Auth_Service.Model.User;
 import com.medicare.Auth_Service.Repositories.RefreshTokenRepository;
 import com.medicare.Auth_Service.Repositories.UserRepository;
-import com.medicare.Auth_Service.Services.TokenService.JwtService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

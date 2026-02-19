@@ -1,6 +1,7 @@
 package com.medicare.Auth_Service.Model;
 
 import com.medicare.Auth_Service.Model.Enum.Role;
+import com.medicare.Auth_Service.Model.Enum.UserStatus;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
@@ -24,21 +25,25 @@ public class User {
     private String userId;
 
     @NotBlank
-    private String firstName;
-
-    @NotBlank
-    private String lastName;
-
-    @NotBlank
     @Size(max = 50)
     private String email;
+
     @Size(min = 8)
     private String password;
+
     @NotNull
     private Boolean verified = false;
+
     @NotNull
     private Date creationDate = new Date();
-    private String GoogleSub;
+
+    private String googleSub;
+
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private UserStatus status = UserStatus.ACTIVE;
+
 }

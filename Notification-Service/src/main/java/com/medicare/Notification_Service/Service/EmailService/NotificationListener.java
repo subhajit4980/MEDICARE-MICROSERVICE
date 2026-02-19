@@ -29,7 +29,7 @@ public class NotificationListener {
         UserRegisteredEvent event = objectMapper.readValue(payload, UserRegisteredEvent.class);
         try {
             Map<String, Object> model = new HashMap<>();
-            model.put("Name", event.getFullName());
+            model.put("Name", event.getFirstName()+" "+event.getLastName());
             model.put("medicareWebsiteUrl", "https://subhajit4980.github.io/Subhajit/");
             config.setClassForTemplateLoading(this.getClass(), "/templates");
             Template t = config.getTemplate("email-template.ftl");

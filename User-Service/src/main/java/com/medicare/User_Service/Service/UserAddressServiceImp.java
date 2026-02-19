@@ -15,13 +15,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImp implements UserService {
-    private static final Logger log = LoggerFactory.getLogger(UserServiceImp.class);
+public class UserAddressServiceImp implements UserAddressService {
+    private static final Logger log = LoggerFactory.getLogger(UserAddressServiceImp.class);
     ModelMapper modelMapper = new ModelMapper();
     private final AddressRepository addressRepository;
 

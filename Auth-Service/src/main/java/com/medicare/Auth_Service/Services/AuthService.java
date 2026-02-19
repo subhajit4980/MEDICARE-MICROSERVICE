@@ -12,9 +12,10 @@ import com.medicare.Auth_Service.Events.UserVerificationRequested;
 import com.medicare.Auth_Service.Exception.UserException;
 import com.medicare.Auth_Service.Model.Enum.Role;
 import com.medicare.Auth_Service.Model.User;
+import com.medicare.Auth_Service.Model.UserCacheData;
 import com.medicare.Auth_Service.Repositories.UserRepository;
 import com.medicare.Auth_Service.Services.TokenService.JwtService;
-import com.medicare.Auth_Service.Services.Schedule.TokenService;
+import com.medicare.Auth_Service.Services.TokenService.TokenService;
 import com.medicare.Auth_Service.Utils.Common;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,7 +38,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -84,8 +84,8 @@ public class AuthService {
 
         // Create user object
         User user = User.builder()
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
+//                .firstName(request.getFirstName())
+//                .lastName(request.getLastName())
                 .email(norm)
                 .password(encoder.encode(request.getPassword()))   // encrypt password
                 .creationDate(new Date())
@@ -94,7 +94,8 @@ public class AuthService {
                 .build();
         log.info("-----> User created");
         // Store the user data in redis temporarily
-        redisTemplate.opsForValue().set(norm, user, 60, TimeUnit.MINUTES);
+        UserCacheData userCacheData=new UserCacheData(user,request.getFirstName(),request.getLastName());
+        redisTemplate.opsForValue().set(norm, userCacheData, 60, TimeUnit.MINUTES);
         String otp = Common.generateOTP();
         redisTemplate.opsForValue().set(norm + "_otp", otp, 5, TimeUnit.MINUTES);
         UserVerificationRequested event = new UserVerificationRequested(

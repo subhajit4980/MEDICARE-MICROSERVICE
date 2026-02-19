@@ -7,10 +7,11 @@ import com.medicare.Auth_Service.Events.OutboxEvent;
 import com.medicare.Auth_Service.Events.UserRegisteredEvent;
 import com.medicare.Auth_Service.Exception.UserException;
 import com.medicare.Auth_Service.Model.User;
+import com.medicare.Auth_Service.Model.UserCacheData;
 import com.medicare.Auth_Service.Repositories.OutboxRepository;
 import com.medicare.Auth_Service.Repositories.UserRepository;
 import com.medicare.Auth_Service.Services.TokenService.JwtService;
-import com.medicare.Auth_Service.Services.Schedule.TokenService;
+import com.medicare.Auth_Service.Services.TokenService.TokenService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.MongoTransactionManager;
@@ -38,8 +39,8 @@ public class UserRegistrationService {
 
         return txTemplate.execute(status -> {
 
-            User user = (User) redisTemplate.opsForValue().get(email);
-            if (user == null) {
+            UserCacheData userCacheData = (UserCacheData) redisTemplate.opsForValue().get(email);
+            if (userCacheData == null) {
                 // UPDATED: throw UserException instead of RuntimeException
                 throw new UserException(
                         HttpStatus.NOT_FOUND,
@@ -49,10 +50,10 @@ public class UserRegistrationService {
             }
 
             // Mark user as verified
-            user.setVerified(true);
+            userCacheData.getUser().setVerified(true);
 
             // Save to MongoDB
-            User saved = repository.save(user);
+            User saved = repository.save(userCacheData.getUser());
 
             // Issue JWT tokens
             String refresh = jwtService.issueRefreshToken(saved.getUserId());
@@ -62,12 +63,13 @@ public class UserRegistrationService {
             tokenService.saveUserToken(saved, access, refresh);
             tokenService.storeRefreshCookie(refresh, response);
 
-            // Publish outbox event
+            // Publish outbox event for user registration successful notification
             try {
                 UserRegisteredEvent payload = new UserRegisteredEvent(
                         saved.getUserId(),
                         saved.getEmail(),
-                        saved.getFirstName() + " " + saved.getLastName()
+                        userCacheData.getFirstName() ,
+                        userCacheData.getLastName()
                 );
 
                 String json = objectMapper.writeValueAsString(payload);
