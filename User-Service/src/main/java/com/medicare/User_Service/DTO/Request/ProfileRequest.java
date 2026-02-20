@@ -1,11 +1,11 @@
-package com.medicare.User_Service.Payload.Request;
+package com.medicare.User_Service.DTO.Request;
 
 import lombok.Data;
 
 import java.util.Date;
 @Data
 public class ProfileRequest {
-    private String userId;
+//    private String userId;
     private String firstName;
     private String lastName;
     private Date dateOfBirth;

@@ -1,23 +1,14 @@
-package com.medicare.User_Service.Models;
+package com.medicare.User_Service.DTO.Response;
 
-import lombok.*;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.Builder;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.Date;
 @Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
-@Document(collection = "UserProfiles")
-public class UserProfile {
-
-    @Id
+public class UserProfileResponse {
     private String userId;
-
     private String firstName;
     private String lastName;
     private Date dateOfBirth;

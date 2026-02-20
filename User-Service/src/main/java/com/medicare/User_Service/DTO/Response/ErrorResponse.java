@@ -1,4 +1,4 @@
-package com.medicare.User_Service.Payload.Response;
+package com.medicare.User_Service.DTO.Response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

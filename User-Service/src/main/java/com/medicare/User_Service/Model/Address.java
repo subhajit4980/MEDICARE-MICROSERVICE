@@ -1,4 +1,4 @@
-package com.medicare.User_Service.Models;
+package com.medicare.User_Service.Model;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;

@@ -1,9 +1,9 @@
 package com.medicare.User_Service.Controller;
 
 
-import com.medicare.User_Service.Models.Address;
-import com.medicare.User_Service.Payload.Request.AddressRequest;
-import com.medicare.User_Service.Payload.Response.MessageResponse;
+import com.medicare.User_Service.Model.Address;
+import com.medicare.User_Service.DTO.Request.AddressRequest;
+import com.medicare.User_Service.DTO.Response.MessageResponse;
 import com.medicare.User_Service.Service.UserAddressService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;

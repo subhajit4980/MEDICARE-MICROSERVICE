@@ -1,9 +1,9 @@
 package com.medicare.User_Service.Service;
 
 import com.medicare.User_Service.Exception.UserException;
-import com.medicare.User_Service.Models.Address;
-import com.medicare.User_Service.Payload.Request.AddressRequest;
-import com.medicare.User_Service.Payload.Response.MessageResponse;
+import com.medicare.User_Service.Model.Address;
+import com.medicare.User_Service.DTO.Request.AddressRequest;
+import com.medicare.User_Service.DTO.Response.MessageResponse;
 import com.medicare.User_Service.Repository.AddressRepository;
 import jakarta.validation.Valid;
 import org.apache.commons.text.StringEscapeUtils;
@@ -19,8 +19,8 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class UserAddressServiceImp implements UserAddressService {
-    private static final Logger log = LoggerFactory.getLogger(UserAddressServiceImp.class);
+public class UserAddressServiceImpl implements UserAddressService {
+    private static final Logger log = LoggerFactory.getLogger(UserAddressServiceImpl.class);
     ModelMapper modelMapper = new ModelMapper();
     private final AddressRepository addressRepository;
 

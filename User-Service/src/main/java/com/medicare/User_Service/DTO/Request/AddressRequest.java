@@ -1,4 +1,4 @@
-package com.medicare.User_Service.Payload.Request;
+package com.medicare.User_Service.DTO.Request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

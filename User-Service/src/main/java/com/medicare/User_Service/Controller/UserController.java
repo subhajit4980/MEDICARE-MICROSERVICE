@@ -1,7 +1,9 @@
 package com.medicare.User_Service.Controller;
 
-import com.medicare.User_Service.Models.UserProfile;
-import com.medicare.User_Service.Payload.Response.MessageResponse;
+import com.medicare.User_Service.DTO.Request.ProfileRequest;
+import com.medicare.User_Service.DTO.Response.MessageResponse;
+import com.medicare.User_Service.DTO.Response.UserProfileResponse;
+import com.medicare.User_Service.Service.UserProfileService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,15 +13,19 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/user/")
 public class UserController {
+    private final UserProfileService userProfileService;
 
-    @PostMapping("")
-//    public ResponseEntity<UserProfile> setUserProfile()
+    @PostMapping("/updateProfile")
+    public ResponseEntity<UserProfileResponse> updateUserProfile(@RequestParam ProfileRequest profileRequest, HttpServletRequest request) {
+        String userId = request.getHeader("X-User-Id");
+        UserProfileResponse userProfileResponse = userProfileService.updateUserProfile(profileRequest, userId);
+        return ResponseEntity.ok(userProfileResponse);
+    }
 
     @GetMapping("")
-    public ResponseEntity<MessageResponse> getUser(HttpServletRequest request) {
+    public ResponseEntity<UserProfileResponse> getUser(HttpServletRequest request) {
         String userId = request.getHeader("X-User-Id");
-
-        return null;
+        return ResponseEntity.ok(userProfileService.getUserProfile(userId));
     }
 
 }
