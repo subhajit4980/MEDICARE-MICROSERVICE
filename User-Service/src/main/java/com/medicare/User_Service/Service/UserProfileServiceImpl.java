@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 public class UserProfileServiceImpl implements UserProfileService {
-    private final ObjectMapper objectMapper;
     private final UserProfileRepository userProfileRepository;
     ModelMapper modelMapper = new ModelMapper();
 
@@ -26,7 +25,8 @@ public class UserProfileServiceImpl implements UserProfileService {
         UserProfile userProfile=userProfileRepository.findByUserId(userId).orElseThrow(()-> new UserException(HttpStatus.NOT_FOUND,"User not found"));
         userProfile.setProfileImageUrl(profileRequest.getProfileImageUrl());
         userProfile.setUpdatedAt(LocalDateTime.now());
-        userProfile.setDateOfBirth(userProfile.getDateOfBirth());
+        userProfile.setDateOfBirth(profileRequest.getDateOfBirth());
+        userProfileRepository.save(userProfile);
         return modelMapper.map(userProfile,UserProfileResponse.class);
     }
 

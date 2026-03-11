@@ -37,6 +37,5 @@ public class Address {
     private String phone; // Phone number
     @NotBlank
     private String label;
-    @NotBlank
     private boolean isDefault;
 }
