@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface AddressRepository extends MongoRepository<Address, String> {
     Optional<List<Address>> findByUserId(String userId);
     Optional<Address> findById(String addressId);
+    long countByUserId(String userId);
 }

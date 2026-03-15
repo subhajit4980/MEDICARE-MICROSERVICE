@@ -1,6 +1,8 @@
 package com.medicare.User_Service.DTO.Request;
 
+import com.medicare.User_Service.Model.AddressType;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
@@ -25,4 +27,6 @@ public class AddressRequest {
     private String phone; // Phone number
     @NotBlank
     private String label;
+    @NotNull
+    private AddressType type;
 }

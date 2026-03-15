@@ -1,9 +1,12 @@
 package com.medicare.User_Service.Model;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -37,5 +40,11 @@ public class Address {
     private String phone; // Phone number
     @NotBlank
     private String label;
+    @NotNull
+    private AddressType type;
+    @NotNull
+    private LocalDateTime createdAt;
+    @NotNull
+    private LocalDateTime updatedAt;
     private boolean isDefault;
 }

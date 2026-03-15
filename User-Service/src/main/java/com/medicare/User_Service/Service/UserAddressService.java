@@ -12,5 +12,5 @@ public interface UserAddressService {
     List<Address> getAddress( String userId);
     Address getAddressById(String userId, String addressId);
     MessageResponse deleteAddress(String userId, String addressId);
-
+    MessageResponse makeDefaultAddress(String userId, String addressId);
 }

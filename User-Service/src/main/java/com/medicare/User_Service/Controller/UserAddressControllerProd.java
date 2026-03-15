@@ -85,4 +85,17 @@ public class UserAddressControllerProd {
         MessageResponse messageResponse = userService.deleteAddress(userId, addressId);
         return ResponseEntity.ok(messageResponse);
     }
+
+    /**
+     * Mark an address as the default for the authenticated user
+     */
+    @PutMapping("/{addressId}/make-default")
+    public ResponseEntity<MessageResponse> makeDefaultAddress(
+            HttpServletRequest request,
+            @PathVariable String addressId
+    ) {
+        String userId = request.getHeader("X-User-Id");
+        MessageResponse messageResponse = userService.makeDefaultAddress(userId, addressId);
+        return ResponseEntity.ok(messageResponse);
+    }
 }

@@ -7,6 +7,8 @@ import com.medicare.Notification_Service.Events.UserVerificationRequested;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -23,11 +25,13 @@ public class NotificationListener {
     private final ObjectMapper objectMapper;
     private final EmailService emailService;
     private final Configuration config;
+    private static final Logger log = LoggerFactory.getLogger(NotificationListener.class);
 
     @KafkaListener(topics = "user-registered-topic", groupId = "notification-group")
     public void onUserRegistered(String payload, @Header(KafkaHeaders.RECEIVED_KEY) String key) throws Exception {
         UserRegisteredEvent event = objectMapper.readValue(payload, UserRegisteredEvent.class);
         try {
+            log.info("Listing user registered topic");
             Map<String, Object> model = new HashMap<>();
             model.put("Name", event.getFirstName()+" "+event.getLastName());
             model.put("medicareWebsiteUrl", "https://subhajit4980.github.io/Subhajit/");
@@ -44,6 +48,7 @@ public class NotificationListener {
 
     @KafkaListener(topics = "user-verification-topic", groupId = "notification-group")
     public void onVerificationRequested(String payload) throws Exception {
+        log.info("Listing user verification topic");
         UserVerificationRequested event = objectMapper.readValue(payload, UserVerificationRequested.class);
         Map<String, Object> model = new HashMap<>();
         model.put("Name", event.getFullName());
@@ -56,6 +61,7 @@ public class NotificationListener {
 
     @KafkaListener(topics = "forgot-password-otp-topic", groupId = "notification-group")
     public void onPasswordChangedOtpRequested(String payload) throws Exception {
+        log.info("Listing forgot password-otp topic");
         PasswordChangedOtpRequested event = objectMapper.readValue(payload, PasswordChangedOtpRequested.class);
         Map<String, Object> model = new HashMap<>();
         model.put("otp", event.getOtp());
