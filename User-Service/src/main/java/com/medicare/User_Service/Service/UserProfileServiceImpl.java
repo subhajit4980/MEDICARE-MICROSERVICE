@@ -1,38 +1,85 @@
 package com.medicare.User_Service.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.medicare.User_Service.DTO.Request.ProfileRequest;
-import com.medicare.User_Service.DTO.Response.MessageResponse;
 import com.medicare.User_Service.DTO.Response.UserProfileResponse;
+import com.medicare.User_Service.DTO.Response.UserSummaryResponse;
 import com.medicare.User_Service.Exception.UserException;
+import com.medicare.User_Service.Mapper.UserProfileMapper;
+import com.medicare.User_Service.Model.Address;
 import com.medicare.User_Service.Model.UserProfile;
+import com.medicare.User_Service.Repository.AddressRepository;
 import com.medicare.User_Service.Repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class UserProfileServiceImpl implements UserProfileService {
     private final UserProfileRepository userProfileRepository;
-    ModelMapper modelMapper = new ModelMapper();
+    private final AddressRepository addressRepository;
+    private final UserProfileMapper userProfileMapper;
 
     @Override
     public UserProfileResponse updateUserProfile(ProfileRequest profileRequest,String userId) {
-        UserProfile userProfile=userProfileRepository.findByUserId(userId).orElseThrow(()-> new UserException(HttpStatus.NOT_FOUND,"User not found"));
-        userProfile.setProfileImageUrl(profileRequest.getProfileImageUrl());
+        UserProfile userProfile = userProfileRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserException(HttpStatus.NOT_FOUND,"User not found"));
+
+        userProfileMapper.updateFromRequest(profileRequest, userProfile);
         userProfile.setUpdatedAt(LocalDateTime.now());
-        userProfile.setDateOfBirth(profileRequest.getDateOfBirth());
-        userProfileRepository.save(userProfile);
-        return modelMapper.map(userProfile,UserProfileResponse.class);
+
+        UserProfile saved = userProfileRepository.save(userProfile);
+        return mapWithCompleteness(saved);
     }
 
     @Override
     public UserProfileResponse getUserProfile(String userId) {
-        UserProfile userProfile=userProfileRepository.findByUserId(userId).orElseThrow(()->new UserException(HttpStatus.NOT_FOUND,"User not found"));
-        return modelMapper.map(userProfile,UserProfileResponse.class);
+        UserProfile userProfile = userProfileRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserException(HttpStatus.NOT_FOUND,"User not found"));
+        return mapWithCompleteness(userProfile);
+    }
+
+    @Override
+    public UserSummaryResponse getUserSummary(String userId) {
+        UserProfile profile = userProfileRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserException(HttpStatus.NOT_FOUND, "User not found"));
+
+        List<Address> addresses = addressRepository.findByUserId(userId).orElse(List.of());
+        Address defaultAddress = addresses.stream()
+                .filter(Address::isDefaultAddress)
+                .findFirst()
+                .orElse(null);
+
+        return UserSummaryResponse.builder()
+                .userId(profile.getUserId())
+                .firstName(profile.getFirstName())
+                .lastName(profile.getLastName())
+                .profileImageUrl(profile.getProfileImageUrl())
+                .language(profile.getLanguage())
+                .timeZone(profile.getTimeZone())
+                .preferredCurrency(profile.getPreferredCurrency())
+                .marketingOptIn(profile.getMarketingOptIn())
+                .defaultAddress(defaultAddress)
+                .build();
+    }
+
+    private UserProfileResponse mapWithCompleteness(UserProfile profile) {
+        UserProfileResponse response = userProfileMapper.toResponse(profile);
+
+        int totalFields = 7;
+        int filled = 0;
+        if (profile.getFirstName() != null && !profile.getFirstName().isBlank()) filled++;
+        if (profile.getLastName() != null && !profile.getLastName().isBlank()) filled++;
+        if (profile.getDateOfBirth() != null) filled++;
+        if (profile.getProfileImageUrl() != null && !profile.getProfileImageUrl().isBlank()) filled++;
+        if (profile.getLanguage() != null && !profile.getLanguage().isBlank()) filled++;
+        if (profile.getTimeZone() != null && !profile.getTimeZone().isBlank()) filled++;
+        if (profile.getPreferredCurrency() != null && !profile.getPreferredCurrency().isBlank()) filled++;
+
+        response.setProfileCompleteness(totalFields == 0 ? 0.0 : (filled * 1.0) / totalFields);
+        return response;
     }
 }

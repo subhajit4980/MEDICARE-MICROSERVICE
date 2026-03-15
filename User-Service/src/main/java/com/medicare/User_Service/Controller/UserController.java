@@ -2,6 +2,7 @@ package com.medicare.User_Service.Controller;
 
 import com.medicare.User_Service.DTO.Request.ProfileRequest;
 import com.medicare.User_Service.DTO.Response.UserProfileResponse;
+import com.medicare.User_Service.DTO.Response.UserSummaryResponse;
 import com.medicare.User_Service.Service.UserProfileService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -29,4 +30,9 @@ public class UserController {
         return ResponseEntity.ok(userProfileService.getUserProfile(userId));
     }
 
+    // Internal endpoint for other services
+    @GetMapping("/internal/{userId}")
+    public ResponseEntity<UserSummaryResponse> getUserSummary(@PathVariable String userId) {
+        return ResponseEntity.ok(userProfileService.getUserSummary(userId));
+    }
 }

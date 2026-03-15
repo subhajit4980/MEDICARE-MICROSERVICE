@@ -1,6 +1,7 @@
 package com.medicare.User_Service.Service;
 
 import com.medicare.User_Service.Exception.UserException;
+import com.medicare.User_Service.Mapper.AddressMapper;
 import com.medicare.User_Service.Model.Address;
 import com.medicare.User_Service.DTO.Request.AddressRequest;
 import com.medicare.User_Service.DTO.Response.MessageResponse;
@@ -8,7 +9,6 @@ import com.medicare.User_Service.Repository.AddressRepository;
 import jakarta.validation.Valid;
 import org.apache.commons.text.StringEscapeUtils;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -24,8 +24,8 @@ import java.util.List;
 public class UserAddressServiceImpl implements UserAddressService {
     private static final Logger log = LoggerFactory.getLogger(UserAddressServiceImpl.class);
     private static final int MAX_ADDRESSES_PER_USER = 10;
-    ModelMapper modelMapper = new ModelMapper();
     private final AddressRepository addressRepository;
+    private final AddressMapper addressMapper;
 
     @Transactional
     @Override
@@ -41,8 +41,8 @@ public class UserAddressServiceImpl implements UserAddressService {
             // 2. Sanitize input (prevent injection or unwanted data)
             sanitizeAddressRequest(addressRequest);
             // 3. Map DTO → Entity
-            Address newAddress = modelMapper.map(addressRequest, Address.class);
-            newAddress.setDefault(existingCount == 0);
+            Address newAddress = addressMapper.toEntity(addressRequest);
+            newAddress.setDefaultAddress(existingCount == 0);
             newAddress.setCreatedAt(LocalDateTime.now());
             newAddress.setUpdatedAt(LocalDateTime.now());
             newAddress.setUserId(userId);
@@ -63,7 +63,7 @@ public class UserAddressServiceImpl implements UserAddressService {
                 throw new UserException(HttpStatus.FORBIDDEN, "You are not authorized to modify this address");
             }
             sanitizeAddressRequest(addressRequest);
-            modelMapper.map(addressRequest, userAddress);
+            addressMapper.updateFromRequest(addressRequest, userAddress);
             userAddress.setUpdatedAt(LocalDateTime.now());
             addressRepository.save(userAddress);
             return new MessageResponse("Address updated successfully",userAddress);
@@ -96,12 +96,13 @@ public class UserAddressServiceImpl implements UserAddressService {
         if (!address.getUserId().equals(userId)) {
             throw new UserException(HttpStatus.FORBIDDEN, "You are not authorized to delete this address");
         }
-        boolean wasDefault = address.isDefault();
+        boolean wasDefault = address.isDefaultAddress();
         addressRepository.delete(address);
         if (wasDefault) {
-            Address newDefault = (Address) addressRepository.findByUserId(userId).stream().toList().get(0);
-            if (newDefault != null) {
-                newDefault.setDefault(true);
+            List<Address> remaining = addressRepository.findByUserId(userId).orElse(List.of());
+            if (!remaining.isEmpty()) {
+                Address newDefault = remaining.get(0);
+                newDefault.setDefaultAddress(true);
                 addressRepository.save(newDefault);
             }
         }
@@ -122,7 +123,7 @@ public class UserAddressServiceImpl implements UserAddressService {
                 .orElseThrow(() -> new UserException(HttpStatus.BAD_REQUEST, "No addresses found for user"));
 
         for (Address addr : userAddresses) {
-            addr.setDefault(addr.getAddressId().equals(addressId));
+            addr.setDefaultAddress(addr.getAddressId().equals(addressId));
         }
 
         addressRepository.saveAll(userAddresses);

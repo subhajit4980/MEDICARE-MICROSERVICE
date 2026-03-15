@@ -22,6 +22,13 @@ public class UserProfile {
     private String lastName;
     private Date dateOfBirth;
     private String profileImageUrl;
+
+    // Preferences
+    private String language;
+    private String timeZone;
+    private String preferredCurrency;
+    private Boolean marketingOptIn;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

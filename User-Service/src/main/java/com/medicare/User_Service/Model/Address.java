@@ -46,5 +46,5 @@ public class Address {
     private LocalDateTime createdAt;
     @NotNull
     private LocalDateTime updatedAt;
-    private boolean isDefault;
+    private boolean defaultAddress;
 }
