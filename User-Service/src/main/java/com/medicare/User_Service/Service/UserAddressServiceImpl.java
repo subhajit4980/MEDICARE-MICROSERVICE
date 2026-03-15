@@ -15,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -30,6 +29,7 @@ public class UserAddressServiceImpl implements UserAddressService {
     @Transactional
     @Override
     public MessageResponse addAddresses(String userId, AddressRequest addressRequest) {
+            log.info("Adding address for userId={}", userId);
             // 1. Validate input
             if (addressRequest == null || userId == null) {
                 throw new UserException(HttpStatus.BAD_REQUEST, "Invalid address request");
@@ -48,6 +48,7 @@ public class UserAddressServiceImpl implements UserAddressService {
             newAddress.setUserId(userId);
             // 4. Save securely
             addressRepository.save(newAddress);
+            log.debug("Address added for userId={} addressId={}", userId, newAddress.getAddressId());
             // 5. Return success message
             return new MessageResponse("Address added successfully",newAddress);
 
@@ -57,6 +58,7 @@ public class UserAddressServiceImpl implements UserAddressService {
     @Override
     @Transactional
     public MessageResponse updateAddress(@Valid String userId, String addressId, AddressRequest addressRequest) {
+            log.info("Updating address addressId={} for userId={}", addressId, userId);
             Address userAddress = addressRepository.findById(addressId)
                     .orElseThrow(() -> new UserException(HttpStatus.NOT_FOUND, "Address not found"));
             if (!userAddress.getUserId().equals(userId)) {
@@ -66,17 +68,20 @@ public class UserAddressServiceImpl implements UserAddressService {
             addressMapper.updateFromRequest(addressRequest, userAddress);
             userAddress.setUpdatedAt(LocalDateTime.now());
             addressRepository.save(userAddress);
+            log.debug("Address updated addressId={} for userId={}", addressId, userId);
             return new MessageResponse("Address updated successfully",userAddress);
 
     }
 
     @Override
     public List<Address> getAddress(String userId) {
+        log.debug("Fetching all addresses for userId={}", userId);
         return (addressRepository.findByUserId(userId).orElseThrow(() -> new UserException(HttpStatus.BAD_REQUEST, "Address not found")));
     }
 
     @Override
     public Address getAddressById(String userId, String addressId) {
+        log.debug("Fetching addressId={} for userId={}", addressId, userId);
         Address address = addressRepository.findById(addressId)
                 .orElseThrow(() -> new UserException(HttpStatus.NOT_FOUND, "Address not found"));
 
@@ -90,6 +95,7 @@ public class UserAddressServiceImpl implements UserAddressService {
     @Override
     @Transactional
     public MessageResponse deleteAddress(String userId, String addressId) {
+        log.info("Deleting addressId={} for userId={}", addressId, userId);
         Address address = addressRepository.findById(addressId)
                 .orElseThrow(() -> new UserException(HttpStatus.NOT_FOUND, "Address not found"));
 
@@ -104,6 +110,7 @@ public class UserAddressServiceImpl implements UserAddressService {
                 Address newDefault = remaining.get(0);
                 newDefault.setDefaultAddress(true);
                 addressRepository.save(newDefault);
+                log.debug("Reassigned default address to addressId={} for userId={}", newDefault.getAddressId(), userId);
             }
         }
         return new MessageResponse("Address deleted successfully",address);
@@ -112,6 +119,7 @@ public class UserAddressServiceImpl implements UserAddressService {
     @Override
     @Transactional
     public MessageResponse makeDefaultAddress(String userId, String addressId) {
+        log.info("Marking addressId={} as default for userId={}", addressId, userId);
         Address targetAddress = addressRepository.findById(addressId)
                 .orElseThrow(() -> new UserException(HttpStatus.NOT_FOUND, "Address not found"));
 

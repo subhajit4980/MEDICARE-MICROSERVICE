@@ -10,6 +10,8 @@ import com.medicare.User_Service.Model.UserProfile;
 import com.medicare.User_Service.Repository.AddressRepository;
 import com.medicare.User_Service.Repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -19,12 +21,15 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserProfileServiceImpl implements UserProfileService {
+    private static final Logger log = LoggerFactory.getLogger(UserProfileServiceImpl.class);
+
     private final UserProfileRepository userProfileRepository;
     private final AddressRepository addressRepository;
     private final UserProfileMapper userProfileMapper;
 
     @Override
     public UserProfileResponse updateUserProfile(ProfileRequest profileRequest,String userId) {
+        log.info("Updating user profile for userId={}", userId);
         UserProfile userProfile = userProfileRepository.findByUserId(userId)
                 .orElseThrow(() -> new UserException(HttpStatus.NOT_FOUND,"User not found"));
 
@@ -32,11 +37,13 @@ public class UserProfileServiceImpl implements UserProfileService {
         userProfile.setUpdatedAt(LocalDateTime.now());
 
         UserProfile saved = userProfileRepository.save(userProfile);
+        log.debug("User profile updated for userId={} at={}", userId, saved.getUpdatedAt());
         return mapWithCompleteness(saved);
     }
 
     @Override
     public UserProfileResponse getUserProfile(String userId) {
+        log.debug("Fetching user profile for userId={}", userId);
         UserProfile userProfile = userProfileRepository.findByUserId(userId)
                 .orElseThrow(() -> new UserException(HttpStatus.NOT_FOUND,"User not found"));
         return mapWithCompleteness(userProfile);
@@ -44,6 +51,7 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Override
     public UserSummaryResponse getUserSummary(String userId) {
+        log.debug("Fetching user summary for userId={}", userId);
         UserProfile profile = userProfileRepository.findByUserId(userId)
                 .orElseThrow(() -> new UserException(HttpStatus.NOT_FOUND, "User not found"));
 
