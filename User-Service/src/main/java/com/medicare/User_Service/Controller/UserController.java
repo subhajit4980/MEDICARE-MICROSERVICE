@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/user/")
@@ -20,7 +22,7 @@ public class UserController {
 
     private final UserProfileService userProfileService;
 
-    @PostMapping("/updateProfile")
+    @PostMapping("profile/updateProfile")
     public ResponseEntity<UserProfileResponse> updateUserProfile(@Valid @RequestBody ProfileRequest profileRequest,
                                                                  HttpServletRequest request) {
         String userId = request.getHeader("X-User-Id");
@@ -29,7 +31,7 @@ public class UserController {
         return ResponseEntity.ok(userProfileResponse);
     }
 
-    @GetMapping("")
+    @GetMapping("profile/")
     public ResponseEntity<UserProfileResponse> getUser(HttpServletRequest request) {
         String userId = request.getHeader("X-User-Id");
         log.debug("Received get user profile request for userId={}", userId);
@@ -37,9 +39,15 @@ public class UserController {
     }
 
     // Internal endpoint for other services
-    @GetMapping("/internal/{userId}")
+    @GetMapping("profile/internal/{userId}")
     public ResponseEntity<UserSummaryResponse> getUserSummary(@PathVariable String userId) {
         log.debug("Received internal user summary request for userId={}", userId);
         return ResponseEntity.ok(userProfileService.getUserSummary(userId));
+    }
+    @GetMapping("admin/")
+    public ResponseEntity<List<UserProfileResponse>> getAllUser(HttpServletRequest request) {
+        String userId = request.getHeader("X-User-Id");
+        log.debug("Received get user profile request for userId={}", userId);
+        return ResponseEntity.ok(userProfileService.getAllUserProfile());
     }
 }

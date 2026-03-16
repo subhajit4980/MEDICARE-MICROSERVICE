@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -47,6 +48,16 @@ public class UserProfileServiceImpl implements UserProfileService {
         UserProfile userProfile = userProfileRepository.findByUserId(userId)
                 .orElseThrow(() -> new UserException(HttpStatus.NOT_FOUND,"User not found"));
         return mapWithCompleteness(userProfile);
+    }
+
+    @Override
+    public List<UserProfileResponse> getAllUserProfile() {
+        List<UserProfileResponse> userProfileResponses=new ArrayList<>();
+        List<UserProfile> allUserProfile=userProfileRepository.findAll();
+        allUserProfile.forEach(user->{
+            userProfileResponses.add(userProfileMapper.toResponse(user));
+        });
+        return userProfileResponses;
     }
 
     @Override

@@ -4,6 +4,7 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 @Component
@@ -33,6 +34,10 @@ public class RouteValidator {
             "/swagger-ui/**",
             "/webjars/**",
             "/swagger-ui.html"
+    );
+    public static final Map<String, List<String>> roleProtectedEndpoints = Map.of(
+            "/admin", List.of("ADMIN"),
+            "/user/profile", List.of("USER", "ADMIN", "MANAGER")
     );
 
     /**
